@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f0e8">
+<meta name="description" content="Oddgrain is the independent creative portfolio of Lucky Kumar: web design, full-stack development, copywriting, Adobe design and photography.">
+<title>Oddgrain® — Lucky Kumar, Creative Technologist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4f0e8;--ink:#20221e;--muted:#73756b;--line:rgba(32,34,30,.18);--acid:#d3ff54;--blue:#b7c9ff;--orange:#f17d58;--serif:Georgia,serif;--sans:"DM Sans",sans-serif;--display:"Space Grotesk",sans-serif;--mono:"DM Mono",monospace;--pad:clamp(20px,5vw,76px)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}::selection{background:var(--acid);color:var(--ink)}
+.topline{height:8px;background:var(--ink)}header{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:18px var(--pad);background:rgba(244,240,232,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.wordmark{font:700 22px var(--display);letter-spacing:-1.5px}.wordmark span{display:inline-block;width:9px;height:9px;background:var(--orange);border-radius:50%;margin-left:3px}nav{display:flex;gap:clamp(14px,2.8vw,38px);align-items:center;font-size:12px;font-weight:600}nav a{position:relative}nav a:after{content:"";position:absolute;left:0;bottom:-5px;height:1px;width:0;background:currentColor;transition:width .25s}nav a:hover:after{width:100%}.nav-contact{border:1px solid var(--ink);padding:10px 15px;border-radius:100px}.menu{display:none;border:1px solid var(--line);background:none;border-radius:50%;width:42px;height:42px}
+.hero{padding:clamp(60px,10vw,150px) var(--pad) 70px;position:relative;overflow:hidden;border-bottom:1px solid var(--line)}.hero-top{display:flex;justify-content:space-between;gap:20px;font:10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.hero h1{font:500 clamp(68px,13.5vw,190px)/.82 var(--display);letter-spacing:-.095em;margin:70px 0 48px;max-width:1200px}.hero h1 .italic{font-family:var(--serif);font-weight:400;font-style:italic;letter-spacing:-.1em}.hero h1 .outline{-webkit-text-stroke:1.5px var(--ink);color:transparent}.hero-bottom{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:end}.hero-intro{font-size:clamp(19px,2.2vw,29px);line-height:1.35;max-width:650px;letter-spacing:-.04em}.hero-intro strong{font-weight:600;text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:var(--orange);text-underline-offset:5px}.hero-note{justify-self:end;max-width:270px;font-size:13px;line-height:1.7;color:var(--muted)}.hero-note b{display:block;color:var(--ink);font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}.hero-stamp{position:absolute;right:8%;top:25%;width:clamp(72px,10vw,140px);aspect-ratio:1;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;transform:rotate(12deg);font:10px var(--mono);text-align:center;line-height:1.6;background:var(--acid);box-shadow:7px 7px 0 var(--ink)}
+.marquee{overflow:hidden;background:var(--acid);border-bottom:1px solid var(--ink);white-space:nowrap;padding:13px 0;font:11px var(--mono);text-transform:uppercase;letter-spacing:.13em}.marquee-track{display:inline-block;animation:marquee 28s linear infinite}.marquee span{padding:0 28px}.marquee .star{font-size:17px}@keyframes marquee{to{transform:translateX(-50%)}}
+section{padding:100px var(--pad);border-bottom:1px solid var(--line)}.section-head{display:flex;justify-content:space-between;align-items:start;gap:30px;margin-bottom:45px}.kicker{font:10px var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}h2{font:500 clamp(40px,6.2vw,84px)/.95 var(--display);letter-spacing:-.075em;margin:15px 0 0}.section-aside{max-width:260px;font-size:13px;line-height:1.7;color:var(--muted);padding-top:24px}
+.work-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.project{grid-column:span 6;min-width:0}.project:nth-child(3n+2){grid-column:span 5}.project:nth-child(3n+3){grid-column:span 7}.project-visual{position:relative;aspect-ratio:1.25;overflow:hidden;background:#ded9cc;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;isolation:isolate}.project-visual:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,transparent 0 15%,rgba(0,0,0,.035) 80%);z-index:-1}.project-visual .visual-type{font:500 clamp(32px,5.5vw,78px)/.85 var(--display);letter-spacing:-.08em;text-align:center;max-width:85%}.project-visual .micro{position:absolute;left:18px;top:18px;font:9px var(--mono);letter-spacing:.12em;text-transform:uppercase}.project-visual .number{position:absolute;right:18px;bottom:15px;font:10px var(--mono)}.v-sona{background:#111;color:#f4f0e8}.v-sona .visual-type{font-size:clamp(60px,10vw,150px);letter-spacing:.18em;color:#c8ff46}.v-fashion{background:#d9c8b8;color:#3d302a}.v-fashion .visual-type{font:italic 500 clamp(38px,6vw,90px) var(--serif);letter-spacing:-.06em}.v-creator{background:#eaff45;color:#151515}.v-creator .visual-type{font-size:clamp(48px,7vw,100px)}.v-shape{background:#171221;color:#f4eadd}.v-shape .visual-type{color:#ff4e9c}.v-book{background:#e9dfca;color:#251f18}.v-book .visual-type{font:italic 500 clamp(38px,6vw,86px) var(--serif)}.v-drawn{background:#f7f3ea;color:#211d17}.v-drawn .visual-type{font:400 clamp(48px,7vw,100px) var(--serif)}.project-info{display:flex;justify-content:space-between;gap:16px;padding:15px 0 28px}.project-title{font:600 19px var(--display);letter-spacing:-.04em}.project-desc{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.6}.project-type{font:9px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-align:right;white-space:nowrap}.project-link{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;font-weight:700;border-bottom:1px solid var(--ink);padding-bottom:4px}.project-link:hover{gap:15px}
+.capabilities{background:#20221e;color:var(--paper)}.capabilities .kicker,.capabilities .section-aside{color:#b0b2a7}.capabilities .section-aside{color:#b0b2a7}.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(244,240,232,.25)}.cap{padding:24px 18px 20px 0;border-bottom:1px solid rgba(244,240,232,.25);min-height:205px}.cap:not(:nth-child(4n)){border-right:1px solid rgba(244,240,232,.25);padding-right:20px}.cap:not(:nth-child(4n+1)){padding-left:20px}.cap-num{font:10px var(--mono);color:var(--acid)}.cap h3{font:500 clamp(20px,2.2vw,30px) var(--display);letter-spacing:-.05em;margin:34px 0 10px}.cap p{font-size:12px;line-height:1.7;color:#b0b2a7;max-width:240px}
+.gallery-section{background:#e8e4da}.gallery-switch{display:flex;gap:8px;align-items:center}.filter-btn{border:1px solid var(--line);border-radius:100px;background:transparent;padding:10px 15px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.07em;cursor:pointer}.filter-btn.active,.filter-btn:hover{background:var(--ink);color:var(--paper)}.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.gallery-card{position:relative;min-width:0}.image-slot{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:4/5;width:100%;background:#d7d2c6;border:1px dashed #8f8d81;position:relative;overflow:hidden;cursor:pointer}.image-slot:focus-visible{outline:3px solid var(--orange);outline-offset:3px}.image-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}.image-slot.has-image img{display:block}.image-slot.has-image .placeholder{display:none}.placeholder{padding:18px;color:#66685e}.placeholder svg{width:25px;height:25px;margin-bottom:15px}.placeholder strong{display:block;font:500 12px var(--display);margin-bottom:7px}.placeholder span{font:9px var(--mono);line-height:1.6;text-transform:uppercase;letter-spacing:.08em}.slot-meta{display:flex;justify-content:space-between;gap:8px;padding:10px 0 20px;font-size:11px}.slot-meta span:last-child{color:var(--muted);font:9px var(--mono);text-transform:uppercase}.gallery-note{margin-top:22px;font-size:12px;color:var(--muted);line-height:1.7}
+.copy-section{background:#d4ddc4}.copy-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:stretch}.copy-quote{background:var(--acid);padding:clamp(25px,5vw,60px);display:flex;flex-direction:column;justify-content:space-between;min-height:330px;border:1px solid var(--ink)}.copy-quote .label{font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase}.copy-quote blockquote{font:500 clamp(30px,4.3vw,58px)/.98 var(--display);letter-spacing:-.07em;margin:55px 0}.copy-quote small{font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em}.copy-side{display:flex;flex-direction:column;justify-content:center}.copy-side h3{font:500 30px var(--display);letter-spacing:-.06em;margin:0 0 18px}.copy-side p{font-size:14px;line-height:1.8;max-width:450px}.copy-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:24px}.copy-tags span{border:1px solid rgba(32,34,30,.35);border-radius:99px;padding:8px 11px;font:9px var(--mono);text-transform:uppercase}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px}.about-big{font:500 clamp(34px,5.2vw,70px)/.98 var(--display);letter-spacing:-.07em}.about-text{font-size:15px;line-height:1.85;max-width:570px}.about-text p+p{margin-top:20px}.skill-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:25px}.skill-list span{border:1px solid var(--line);border-radius:100px;padding:9px 12px;font:10px var(--mono)}
+.contact{background:var(--orange)}.contact-row{display:flex;align-items:end;justify-content:space-between;gap:30px}.contact h2{font-size:clamp(52px,10vw,135px);max-width:850px}.contact-link{display:inline-flex;align-items:center;gap:15px;border-bottom:1px solid var(--ink);padding:12px 0;font-size:14px;font-weight:700;white-space:nowrap}.contact-link:hover{gap:23px}footer{padding:22px var(--pad);display:flex;justify-content:space-between;gap:15px;font:10px var(--mono);text-transform:uppercase;color:var(--muted)}.back-top{color:var(--ink)}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}.reveal.in{opacity:1;transform:none}
+@media(max-width:800px){nav{gap:14px}nav a:not(.nav-contact){display:none}.menu{display:block}.hero h1{margin-top:65px}.hero-stamp{top:19%;right:7%}.hero-bottom,.copy-grid,.about-grid{grid-template-columns:1fr}.hero-note{justify-self:start}.project,.project:nth-child(3n+2),.project:nth-child(3n+3){grid-column:span 6}.cap-grid{grid-template-columns:repeat(2,1fr)}.cap:not(:nth-child(4n)){border-right:0;padding-right:0}.cap:not(:nth-child(4n+1)){padding-left:0}.cap:nth-child(odd){border-right:1px solid rgba(244,240,232,.25);padding-right:18px}.cap:nth-child(even){padding-left:18px}.gallery-grid{grid-template-columns:repeat(2,1fr)}.section-head{flex-direction:column}.section-aside{padding-top:0}.contact-row{align-items:start;flex-direction:column}}
+@media(max-width:520px){header{padding-top:14px;padding-bottom:14px}.nav-contact{padding:9px 11px}.hero{padding-top:55px}.hero-top span:last-child{display:none}.hero h1{font-size:clamp(60px,18vw,100px);margin:70px 0 35px}.hero-stamp{width:66px;top:17%;right:7%;font-size:8px}.hero-bottom{gap:25px}.hero-intro{font-size:20px}section{padding-top:70px;padding-bottom:70px}.work-grid{gap:5px 12px}.project,.project:nth-child(3n+2),.project:nth-child(3n+3){grid-column:span 12}.project-visual{aspect-ratio:1.25}.project-info{padding-bottom:22px}.cap{min-height:175px}.gallery-grid{gap:8px}.slot-meta{font-size:10px}.contact h2{font-size:58px}footer{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="topline"></div>
+<header>
+  <a class="wordmark" href="#top" aria-label="Oddgrain home">oddgrain<span></span></a>
+  <nav aria-label="Main navigation">
+    <a href="#work">Selected work</a><a href="#practice">What I do</a><a href="#visuals">Visual archive</a><a href="#about">About</a><a class="nav-contact" href="#contact">Let's talk ↗</a>
+  </nav>
+  <button class="menu" aria-label="Open navigation" onclick="document.querySelector('nav').classList.toggle('nav-open')">☰</button>
+</header>
+<main id="top">
+<section class="hero">
+  <div class="hero-top"><span>Independent creative practice / India</span><span>Design × code × language</span></div>
+  <div class="hero-stamp">ODD BY<br>DESIGN<br>© 2026</div>
+  <h1>Good work<br>has a <span class="italic">point</span><br><span class="outline">of view.</span></h1>
+  <div class="hero-bottom">
+    <p class="hero-intro">I’m Lucky Kumar. I bring <strong>design, development and words</strong> into the same room to make digital things with character.</p>
+    <p class="hero-note"><b>Not one box. One practice.</b> Web experiences, brand visuals, persuasive copy and photographs, connected by curiosity and a sharp eye for detail.</p>
+  </div>
+</section>
+<div class="marquee" aria-hidden="true"><div class="marquee-track"><span>Oddgrain®</span><span class="star">✳</span><span>Digital experiences</span><span class="star">✳</span><span>Brand thinking</span><span class="star">✳</span><span>Words with intent</span><span class="star">✳</span><span>Oddgrain®</span><span class="star">✳</span><span>Digital experiences</span><span class="star">✳</span><span>Brand thinking</span><span class="star">✳</span><span>Words with intent</span><span class="star">✳</span></div></div>
+<section id="work">
+  <div class="section-head reveal"><div><div class="kicker">01 / Selected experiments</div><h2>Made to be<br>looked at. <em>Used.</em></h2></div><p class="section-aside">A collection of digital concepts and interaction studies. Each project opens its own page, so the original experience stays intact.</p></div>
+  <div class="work-grid">
+    <article class="project reveal"><a href="projects/sona-experience.html"><div class="project-visual v-sona"><span class="micro">01 / Digital product</span><div class="visual-type">SONA</div><span class="number">SOUND / FORM / FEELING</span></div></a><div class="project-info"><div><div class="project-title">SONA / The audio experience</div><p class="project-desc">Product storytelling, motion and an immersive visual language.</p><a class="project-link" href="projects/sona-experience.html">Explore concept ↗</a></div><div class="project-type">Web design</div></div></article>
+    <article class="project reveal"><a href="projects/sona-one.html"><div class="project-visual v-sona"><span class="micro">02 / Product launch</span><div class="visual-type">ONE<span style="color:#f4f0e8">.</span></div><span class="number">WIRELESS / EVERYDAY</span></div></a><div class="project-info"><div><div class="project-title">SONA ONE</div><p class="project-desc">A product-led landing page for everyday wireless audio.</p><a class="project-link" href="projects/sona-one.html">Explore concept ↗</a></div><div class="project-type">Web design</div></div></article>
+    <article class="project reveal"><a href="projects/atelier-noir.html"><div class="project-visual v-fashion"><span class="micro">03 / Fashion concept</span><div class="visual-type">ATELIER<br>NOIR</div><span class="number">CONSIDERED CLOTHING</span></div></a><div class="project-info"><div><div class="project-title">Atelier Noir</div><p class="project-desc">Quiet luxury, editorial type and a considered shopping experience.</p><a class="project-link" href="projects/atelier-noir.html">Explore concept ↗</a></div><div class="project-type">E-commerce</div></div></article>
+    <article class="project reveal"><a href="projects/nia-nova.html"><div class="project-visual v-creator"><span class="micro">04 / Creator concept</span><div class="visual-type">NIA<br>NOVA®</div><span class="number">CULTURE / COLLABORATIONS</span></div></a><div class="project-info"><div><div class="project-title">Creator / Culture site</div><p class="project-desc">A playful influencer platform designed around partnership enquiries.</p><a class="project-link" href="projects/nia-nova.html">Explore concept ↗</a></div><div class="project-type">Campaign</div></div></article>
+    <article class="project reveal"><a href="projects/inside-the-shape.html"><div class="project-visual v-shape"><span class="micro">05 / Portfolio study</span><div class="visual-type">INSIDE<br>THE SHAPE</div><span class="number">FORM / MOVEMENT</span></div></a><div class="project-info"><div><div class="project-title">Inside the Shape</div><p class="project-desc">A motion-led study connecting four creative disciplines.</p><a class="project-link" href="projects/inside-the-shape.html">Explore concept ↗</a></div><div class="project-type">Interaction</div></div></article>
+    <article class="project reveal"><a href="projects/the-studio-book.html"><div class="project-visual v-book"><span class="micro">06 / Editorial study</span><div class="visual-type">The Studio<br>Book</div><span class="number">A PORTFOLIO IN CHAPTERS</span></div></a><div class="project-info"><div><div class="project-title">The Studio Book</div><p class="project-desc">A tactile, book-inspired way to move through a portfolio.</p><a class="project-link" href="projects/the-studio-book.html">Explore concept ↗</a></div><div class="project-type">Editorial</div></div></article>
+    <article class="project reveal"><a href="projects/drawn-by-scroll.html"><div class="project-visual v-drawn"><span class="micro">07 / Scroll experiment</span><div class="visual-type">Drawn<br><i>by scroll.</i></div><span class="number">LINES BECOME STORY</span></div></a><div class="project-info"><div><div class="project-title">Drawn by Scroll</div><p class="project-desc">An interactive canvas where movement reveals the story.</p><a class="project-link" href="projects/drawn-by-scroll.html">Explore concept ↗</a></div><div class="project-type">Creative code</div></div></article>
+    <article class="project reveal"><a href="projects/line-field.html"><div class="project-visual v-shape"><span class="micro">08 / Visual system</span><div class="visual-type">LINE<br>FIELD</div><span class="number">A STUDY IN LAYERS</span></div></a><div class="project-info"><div><div class="project-title">Line Field</div><p class="project-desc">Generative lines, restrained type and a living canvas.</p><a class="project-link" href="projects/line-field.html">Explore concept ↗</a></div><div class="project-type">Creative code</div></div></article>
+  </div>
+</section>
+<section id="practice" class="capabilities">
+  <div class="section-head reveal"><div><div class="kicker">02 / The practice</div><h2>Different tools.<br>One way of <em>thinking.</em></h2></div><p class="section-aside">I move between disciplines because the best solutions often happen at the edges between them.</p></div>
+  <div class="cap-grid">
+    <div class="cap reveal"><span class="cap-num">01 / DIGITAL</span><h3>Web design</h3><p>Clear hierarchy, useful interfaces, responsive systems and details that make digital feel considered.</p></div>
+    <div class="cap reveal"><span class="cap-num">02 / SYSTEMS</span><h3>Full-stack development</h3><p>Frontend experiences backed by APIs, data, integrations and practical implementation.</p></div>
+    <div class="cap reveal"><span class="cap-num">03 / VISUALS</span><h3>Adobe & design</h3><p>Campaign graphics, image-making, brand assets, visual compositions and creative exploration.</p></div>
+    <div class="cap reveal"><span class="cap-num">04 / LANGUAGE</span><h3>Copywriting</h3><p>Brand voice, campaign concepts, headlines and messaging built around the audience and the point.</p></div>
+  </div>
+</section>
+<section id="visuals" class="gallery-section">
+  <div class="section-head reveal"><div><div class="kicker">03 / Visual archive</div><h2>Made with pixels.<br>Seen through a <em>lens.</em></h2></div><p class="section-aside">Your work should lead. These are intentionally empty image slots, ready for real Adobe projects and photographs, not stock imagery pretending to be yours.</p></div>
+  <div class="gallery-switch" role="group" aria-label="Gallery category"><button class="filter-btn active" data-filter="adobe">Adobe / Design</button><button class="filter-btn" data-filter="photo">Photography</button></div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+  <p class="gallery-note">To add work, replace the placeholder files in <code>assets/adobe/</code> or <code>assets/photography/</code> with files named adobe-01.jpg to adobe-08.jpg or photo-01.jpg to photo-08.jpg. The gallery checks for files automatically. Use your own original work and add a caption in the gallery data below.</p>
+</section>
+<section id="copy" class="copy-section">
+  <div class="section-head reveal"><div><div class="kicker">04 / Words that work</div><h2>Copy is not the<br>decoration. It's the <em>idea.</em></h2></div><p class="section-aside">Writing that gives the visual a point of view, makes a brand sound like itself and gives an audience a reason to care.</p></div>
+  <div class="copy-grid reveal">
+    <div class="copy-quote"><span class="label">Copywriting / Brand thinking</span><blockquote>“The right words don't fill space. They change what the space means.”</blockquote><small>Oddgrain point of view / 001</small></div>
+    <div class="copy-side"><h3>From a hook to a whole voice.</h3><p>Campaign concepts, social copy, website messaging, product stories and SEO-minded content. I like writing that sounds human, understands the brief and knows what it needs the reader to do or feel.</p><div class="copy-tags"><span>Brand voice</span><span>Campaigns</span><span>Social content</span><span>Web copy</span><span>SEO content</span><span>Concepts</span></div></div>
+  </div>
+</section>
+<section id="about">
+  <div class="section-head reveal"><div><div class="kicker">05 / A little context</div><h2>Creative by instinct.<br>Technical by <em>choice.</em></h2></div></div>
+  <div class="about-grid reveal"><p class="about-big">I don't want to make more noise. I want to make things worth noticing.</p><div class="about-text"><p>I'm Lucky Kumar, a multidisciplinary creative working across web design, full-stack development, copywriting and Adobe-based visual work. I enjoy the whole process: finding the idea, shaping the message, designing the experience and making it work.</p><p>Oddgrain is the home for that range. Not a list of unrelated skills, but a connected practice where design informs code, writing sharpens strategy and visual curiosity keeps everything moving.</p><div class="skill-list"><span>HTML / CSS / JS</span><span>Frontend & backend</span><span>Photoshop</span><span>Illustrator</span><span>Premiere Pro</span><span>Blender</span><span>WordPress</span><span>SEO & copy</span></div></div></div>
+</section>
+<section id="contact" class="contact">
+  <div class="kicker">06 / Start a conversation</div>
+  <div class="contact-row"><h2>Have a good<br>one in mind?</h2><a class="contact-link" href="mailto:YOUR-EMAIL@example.com">Tell me about it <span>↗</span></a></div>
+</section>
+</main>
+<footer><span>© 2026 Oddgrain / Lucky Kumar</span><span>Independent creative practice</span><a class="back-top" href="#top">Back to top ↑</a></footer>
+<script>
+const galleryData = {
+ adobe: [
+  ["Campaign / Graphic Design","adobe-01.jpg"],["Brand identity","adobe-02.jpg"],["Digital composition","adobe-03.jpg"],["Social creative","adobe-04.jpg"],
+  ["Poster / Typography","adobe-05.jpg"],["Photo manipulation","adobe-06.jpg"],["3D / Product visual","adobe-07.jpg"],["Other experiments","adobe-08.jpg"]
+ ],
+ photo: [
+  ["Featured photograph","photo-01.jpg"],["Street / Everyday","photo-02.jpg"],["Portrait / People","photo-03.jpg"],["Architecture / Place","photo-04.jpg"],
+  ["Colour study","photo-05.jpg"],["Texture / Detail","photo-06.jpg"],["Travel / Landscape","photo-07.jpg"],["Personal favourite","photo-08.jpg"]
+ ]
+};
+const grid = document.getElementById('galleryGrid');
+function renderGallery(type){
+  grid.innerHTML = '';
+  galleryData[type].forEach((item,i)=>{
+    const folder = type === 'adobe' ? 'adobe' : 'photography';
+    const src = `assets/${folder}/${item[1]}`;
+    const card = document.createElement('article'); card.className='gallery-card reveal';
+    card.innerHTML = `<div class="image-slot" tabindex="0" role="img" aria-label="${item[0]} placeholder"><img alt="${item[0]}" loading="lazy"><div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><strong>${item[0]}</strong><span>Drop your image here<br>${String(i+1).padStart(2,'0')} / 08</span></div></div><div class="slot-meta"><span>${item[0]}</span><span>${type==='adobe'?'Adobe / Visual':'Photography'}</span></div>`;
+    const img=card.querySelector('img');
+    img.onload=()=>card.querySelector('.image-slot').classList.add('has-image');
+    img.onerror=()=>{};
+    img.src=src;
+    grid.appendChild(card);
+  });
+  observeReveals();
+}
+document.querySelectorAll('.filter-btn').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===btn));
+ renderGallery(btn.dataset.filter);
+}));
+function observeReveals(){
+ const observer = new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');observer.unobserve(e.target)}}),{threshold:.08});
+ document.querySelectorAll('.reveal:not(.in)').forEach(el=>observer.observe(el));
+}
+renderGallery('adobe');observeReveals();
+const nav=document.querySelector('nav');
+nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('nav-open')));
+const style=document.createElement('style');style.textContent='@media(max-width:800px){nav.nav-open{position:absolute;top:100%;left:0;right:0;background:var(--paper);padding:20px var(--pad);display:flex;flex-direction:column;align-items:flex-start;border-bottom:1px solid var(--line)}nav.nav-open a{display:block!important}}';document.head.appendChild(style);
+</script>
+</body>
+</html>
