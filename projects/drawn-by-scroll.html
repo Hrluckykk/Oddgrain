@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucky Kumar — Drawn</title>
+<style>
+  :root {
+    --canvas: #f7f3ea;
+    --ink: #1a1712;
+    --ink-soft: #4a443b;
+    --muted: #948b7c;
+    --accent: #e05a3a;
+    --accent-2: #2a6fdb;
+    --accent-3: #d4a234;
+    --line: rgba(26, 23, 18, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    overflow: hidden;
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ CUSTOM CURSOR — a pencil tip ============ */
+  .cursor-tip {
+    position: fixed; top: 0; left: 0;
+    width: 26px; height: 26px;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%,-50%);
+    transition: width .3s ease, height .3s ease, opacity .3s ease;
+  }
+  .cursor-tip::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform: translate(-50%, -30%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 18px solid var(--ink);
+  }
+  .cursor-tip::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 4px; height: 4px;
+    transform: translate(-50%, calc(-50% + 14px));
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  body.hovering .cursor-tip { width: 34px; height: 34px; }
+  body.clicking .cursor-tip { width: 14px; height: 14px; }
+
+  /* ============ CANVAS — the living drawing ============ */
+  canvas#draw {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* ============ PAPER TEXTURE ============ */
+  .paper {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 100% 100% at 50% 30%,
+        transparent 0%,
+        rgba(200, 185, 150, 0.08) 100%);
+  }
+  .paper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.45;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/></svg>");
+  }
+
+  /* ============ THE CONTENT LAYERS — everything fades in as the line passes ============ */
+  .reveal {
+    position: fixed;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    will-change: opacity, transform, filter;
+    transition: opacity .4s ease;
+  }
+  .reveal.visible {
+    pointer-events: auto;
+  }
+
+  /* Scroll drives which of these are visible via JS.
+     Each block has a "trigger" — a Y value on the scroll track. */
+
+  /* Hero — top of the scroll */
+  .hero {
+    top: 12vh;
+    left: 8vw;
+    max-width: 640px;
+  }
+  .hero .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .hero .eyebrow::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--accent);
+  }
+  .hero h1 {
+    font-size: clamp(3.2rem, 9vw, 7.5rem);
+    line-height: 0.9;
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    margin-bottom: 1.6rem;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero p {
+    font-size: 1.15rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    max-width: 480px;
+  }
+  .hero p strong { color: var(--ink); font-weight: 600; }
+
+  /* Frontend — right side, mid-upper scroll */
+  .block-frontend {
+    top: 22vh;
+    right: 8vw;
+    max-width: 460px;
+    text-align: right;
+  }
+
+  /* Backend — left side, mid scroll */
+  .block-backend {
+    top: 42vh;
+    left: 10vw;
+    max-width: 460px;
+  }
+
+  /* Adobe — right side, mid-lower */
+  .block-adobe {
+    top: 58vh;
+    right: 10vw;
+    max-width: 460px;
+    text-align: right;
+  }
+
+  /* Copy — left side, lower */
+  .block-copy {
+    top: 76vh;
+    left: 8vw;
+    max-width: 480px;
+  }
+
+  /* Closing — bottom */
+  .block-closing {
+    bottom: 12vh;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 640px;
+    text-align: center;
+  }
+
+  /* Shared block typography */
+  .block-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .block-frontend .block-label,
+  .block-adobe .block-label { justify-content: flex-end; }
+  .block-label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent-2);
+  }
+  .block-frontend .block-label::before,
+  .block-adobe .block-label::before {
+    order: 2;
+    background: var(--accent-3);
+  }
+  .block-backend .block-label::before { background: var(--accent-2); }
+  .block-copy .block-label::before { background: var(--accent); }
+
+  .block-title {
+    font-size: clamp(2rem, 4.5vw, 3.4rem);
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    margin-bottom: 1.2rem;
+  }
+  .block-title em { font-style: italic; }
+  .block-frontend .block-title em { color: var(--accent); }
+  .block-backend .block-title em { color: var(--accent-2); }
+  .block-adobe .block-title em { color: var(--accent-3); }
+  .block-copy .block-title em { color: var(--accent); }
+
+  .block-body {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300;
+  }
+  .block-body strong { color: var(--ink); font-weight: 500; }
+
+  .block-tags {
+    margin-top: 1.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .block-frontend .block-tags,
+  .block-adobe .block-tags { justify-content: flex-end; }
+
+  /* Closing contact */
+  .closing-title {
+    font-size: clamp(2rem, 4.5vw, 3.4rem);
+    line-height: 1.05;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    margin-bottom: 1.4rem;
+  }
+  .closing-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .closing-body {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300;
+    margin-bottom: 1.8rem;
+  }
+  .closing-link {
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--accent);
+    transition: color .3s ease, border-color .3s ease;
+    cursor: none;
+    pointer-events: auto;
+  }
+  .closing-link:hover {
+    color: var(--accent);
+    border-color: var(--accent-2);
+  }
+
+  /* ============ SCROLL PROGRESS — vertical hairline on the right ============ */
+  .progress-rail {
+    position: fixed;
+    top: 15vh;
+    bottom: 15vh;
+    right: 2.4rem;
+    width: 1px;
+    background: var(--line);
+    z-index: 100;
+    pointer-events: none;
+  }
+  .progress-fill {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 0%;
+    background: var(--accent);
+    transition: height .1s linear;
+  }
+  .progress-label {
+    position: fixed;
+    right: 2.4rem;
+    top: 50%;
+    transform: translate(50%, -50%) rotate(90deg);
+    transform-origin: center;
+    font-family: 'Courier New', monospace;
+    font-size: 0.56rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--muted);
+    z-index: 100;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* ============ CORNER MARK ============ */
+  .corner {
+    position: fixed;
+    top: 2rem; left: 2rem;
+    z-index: 100;
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    pointer-events: none;
+  }
+  .corner em { font-style: italic; color: var(--accent); }
+
+  .corner-right {
+    position: fixed;
+    top: 2rem; right: 2rem;
+    z-index: 100;
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.8;
+    pointer-events: none;
+  }
+
+  /* ============ INSTRUCTION — bottom left, fades after first scroll ============ */
+  .instruction {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 100;
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    transition: opacity .8s ease;
+    pointer-events: none;
+  }
+  .instruction-line {
+    width: 36px; height: 1px;
+    background: var(--accent);
+    position: relative;
+    overflow: hidden;
+  }
+  .instruction-line::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--ink);
+    animation: slide 2.4s ease-in-out infinite;
+  }
+  @keyframes slide {
+    0%,100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+  }
+  .instruction.hide { opacity: 0; }
+
+  /* ============ ENTER SCREEN ============ */
+  .enter {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: var(--canvas);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    transition: opacity 1.2s cubic-bezier(.16,1,.3,1), visibility 1.2s;
+  }
+  .enter.gone {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .enter-eyebrow {
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0;
+    animation: fadeUp 1s .2s ease forwards;
+  }
+  .enter-title {
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-weight: 400;
+    text-align: center;
+    color: var(--ink);
+    opacity: 0;
+    animation: fadeUp 1.2s .4s ease forwards;
+  }
+  .enter-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .enter-sub {
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    line-height: 2;
+    opacity: 0;
+    animation: fadeUp 1.2s .7s ease forwards;
+  }
+  .enter-btn {
+    margin-top: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--canvas);
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 1rem 2.8rem;
+    cursor: none;
+    opacity: 0;
+    animation: fadeUp 1.2s 1s ease forwards;
+    transition: background .4s ease, color .4s ease;
+  }
+  .enter-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 820px) {
+    .hero, .block-frontend, .block-backend, .block-adobe, .block-copy, .block-closing {
+      left: 6vw; right: 6vw; max-width: none;
+      text-align: left;
+    }
+    .block-frontend .block-label,
+    .block-adobe .block-label { justify-content: flex-start; }
+    .block-frontend .block-label::before,
+    .block-adobe .block-label::before { order: 0; }
+    .block-frontend .block-tags,
+    .block-adobe .block-tags { justify-content: flex-start; }
+    .hero { top: 14vh; }
+    .block-frontend { top: 22vh; }
+    .block-backend { top: 42vh; }
+    .block-adobe { top: 60vh; }
+    .block-copy { top: 76vh; }
+    .block-closing { bottom: 8vh; transform: none; text-align: left; }
+    .progress-rail, .progress-label { display: none; }
+    .corner-right { display: none; }
+    .cursor-tip { display: none; }
+    .instruction { font-size: 0.55rem; bottom: 1.4rem; left: 1.4rem; }
+    .corner { top: 1.4rem; left: 1.4rem; font-size: 0.95rem; }
+    .block-title { font-size: 1.8rem; }
+    .hero h1 { font-size: clamp(2.6rem, 12vw, 4rem); }
+  }
+</style>
+</head>
+<body>
+
+  <div class="cursor-tip" id="cursorTip"></div>
+
+  <div class="paper"></div>
+
+  <canvas id="draw"></canvas>
+
+  <!-- Corner marks -->
+  <div class="corner">Lucky <em>Kumar</em></div>
+  <div class="corner-right">Drawn<br>MMXXV</div>
+
+  <!-- Progress rail -->
+  <div class="progress-rail">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-label" id="progressLabel">0%</div>
+
+  <!-- Content reveal blocks -->
+  <div class="reveal hero" id="blockHero">
+    <div class="eyebrow">Frontend · Backend · Adobe · Copy</div>
+    <h1>Lucky<br>Kumar<em>.</em></h1>
+    <p>
+      A developer and writer working where <strong>engineering precision</strong>
+      meets <strong>editorial craft</strong>. Four disciplines, one point of view.
+      Scroll to draw the rest.
+    </p>
+  </div>
+
+  <div class="reveal block-frontend" id="blockFrontend">
+    <div class="block-label">01 — Frontend</div>
+    <h2 class="block-title">The <em>surface</em><br>of things.</h2>
+    <p class="block-body">
+      Interfaces built with intent. Clean semantics, fluid motion, and
+      performance that stays out of the way. Every transition is a decision.
+    </p>
+    <div class="block-tags">
+      <span>HTML · CSS · JS</span>
+      <span>Motion</span>
+      <span>Accessibility</span>
+    </div>
+  </div>
+
+  <div class="reveal block-backend" id="blockBackend">
+    <div class="block-label">02 — Backend</div>
+    <h2 class="block-title">The <em>structure</em><br>underneath.</h2>
+    <p class="block-body">
+      APIs, data models, and architecture that scale quietly. The invisible
+      work that makes the visible work possible.
+    </p>
+    <div class="block-tags">
+      <span>APIs</span>
+      <span>Data models</span>
+      <span>Architecture</span>
+    </div>
+  </div>
+
+  <div class="reveal block-adobe" id="blockAdobe">
+    <div class="block-label">03 — Adobe Suite</div>
+    <h2 class="block-title">The <em>form</em><br>of feeling.</h2>
+    <p class="block-body">
+      Design that respects the grid but knows when to break it. From brand
+      systems to pixel-perfect composition, every element earns its place.
+    </p>
+    <div class="block-tags">
+      <span>Photoshop</span>
+      <span>Illustrator</span>
+      <span>Brand</span>
+    </div>
+  </div>
+
+  <div class="reveal block-copy" id="blockCopy">
+    <div class="block-label">04 — Copywriting</div>
+    <h2 class="block-title">The <em>voice</em><br>of the thing.</h2>
+    <p class="block-body">
+      Words that carry weight. Every headline, every line of microcopy —
+      written to be read, not skimmed. Clarity first, rhythm always.
+    </p>
+    <div class="block-tags">
+      <span>Headlines</span>
+      <span>Microcopy</span>
+      <span>Voice</span>
+    </div>
+  </div>
+
+  <div class="reveal block-closing" id="blockClosing">
+    <h2 class="closing-title">Let's build<br>something <em>considered.</em></h2>
+    <p class="closing-body">
+      Open to thoughtful projects, collaborations, and conversations.
+      Reach out — I reply to everything.
+    </p>
+    <a href="mailto:hello@luckykumar.dev" class="closing-link">hello@luckykumar.dev</a>
+  </div>
+
+  <!-- Instruction -->
+  <div class="instruction" id="instruction">
+    <div class="instruction-line"></div>
+    <span>Scroll to draw</span>
+  </div>
+
+  <!-- Enter screen -->
+  <div class="enter" id="enter">
+    <div class="enter-eyebrow">An Interactive Drawing</div>
+    <div class="enter-title">Drawn<br><em>by scroll</em></div>
+    <div class="enter-sub">Lucky Kumar<br>Frontend · Backend · Adobe · Copy</div>
+    <button class="enter-btn" id="enterBtn">Begin</button>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ============================================================
+  // CURSOR
+  // ============================================================
+  const tip = document.getElementById('cursorTip');
+  let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+  let tx = mouseX, ty = mouseY;
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+  });
+  function animateCursor() {
+    tx += (mouseX - tx) * 0.35;
+    ty += (mouseY - ty) * 0.35;
+    tip.style.left = tx + 'px';
+    tip.style.top = ty + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.addEventListener('mousedown', () => document.body.classList.add('clicking'));
+  document.addEventListener('mouseup', () => document.body.classList.remove('clicking'));
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  });
+
+  // ============================================================
+  // THE DRAWING ENGINE
+  //
+  // The core idea:
+  //   - We maintain a "draw progress" p from 0 to 1.
+  //   - p is driven by scroll position — but NOT as discrete steps.
+  //     It's a continuous value. Scroll up/down moves p smoothly.
+  //   - A line is drawn on the canvas whose shape is a function of p.
+  //     As p goes 0 → 1, the line extends from top-left to bottom-right
+  //     in a slow serpentine curve, branching and curving.
+  //   - Each content block has a trigger point on p (0.0, 0.22, 0.42, 0.58,
+  //     0.76, 1.0). When p passes that point, the block fades in.
+  //   - Because p is continuous and reversible, scrolling back up literally
+  //     *un-draws* the line and fades the content back out.
+  //
+  // The line itself is built from a set of anchor points defined by a
+  // smooth parametric curve. We sample it at many points and draw the
+  // segment from the start up to the current progress.
+  // ============================================================
+
+  const canvas = document.getElementById('draw');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ---- The curve itself ----
+  // We define a set of "stations" — key points the line passes through
+  // as progress goes from 0 to 1. Each station is in normalized coords (0..1).
+  // The line connects them with smooth curves.
+  const STATIONS = [
+    { x: 0.02, y: 0.05, curve: 0.0 },
+    { x: 0.10, y: 0.18, curve: 0.6 },
+    { x: 0.22, y: 0.22, curve: -0.4 },
+    { x: 0.36, y: 0.32, curve: 0.5 },
+    { x: 0.48, y: 0.44, curve: -0.3 },
+    { x: 0.60, y: 0.52, curve: 0.5 },
+    { x: 0.72, y: 0.62, curve: -0.4 },
+    { x: 0.84, y: 0.72, curve: 0.6 },
+    { x: 0.92, y: 0.82, curve: -0.2 },
+    { x: 0.98, y: 0.94, curve: 0.0 }
+  ];
+
+  // Sample the curve into N points
+  const SAMPLES = 900;
+  const curvePoints = []; // {x, y} in pixels
+
+  function buildCurve() {
+    curvePoints.length = 0;
+    const N = SAMPLES;
+
+    // Interpolate along the stations using Catmull-Rom style smoothing
+    for (let i = 0; i <= N; i++) {
+      const t = i / N; // 0..1
+      // Find the two surrounding stations
+      const f = t * (STATIONS.length - 1);
+      const idx = Math.min(STATIONS.length - 2, Math.floor(f));
+      const local = f - idx;
+      const a = STATIONS[idx];
+      const b = STATIONS[idx + 1];
+
+      // Smoothstep between stations
+      const s = local * local * (3 - 2 * local);
+
+      // Base position
+      const bx = a.x + (b.x - a.x) * s;
+      const by = a.y + (b.y - a.y) * s;
+
+      // Add a perpendicular wobble (curve) — this makes it feel hand-drawn
+      // The wobble amplitude comes from the station's `curve` value and fades
+      // between stations.
+      const cx = a.curve * (1 - s) + b.curve * s;
+      // Perpendicular direction of the segment
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const px = -dy / len;
+      const py = dx / len;
+      // Wobble scales with a sine along the length and the local curve strength
+      const wobble = Math.sin(local * Math.PI) * cx * 0.09;
+
+      let x = bx + px * wobble;
+      let y = by + py * wobble;
+
+      // Also add a tiny high-frequency jitter (hand-drawn) that fades with t
+      // (we don't want the very start or end jittery)
+      const edgeFade = Math.min(1, Math.min(t * 8, (1 - t) * 8));
+      const j = Math.sin(t * 180 + 1.2) * 0.0009 * edgeFade;
+      x += j;
+      y += Math.cos(t * 210 + 2.3) * 0.0009 * edgeFade;
+
+      // Convert to pixels — leave margin so the line stays on-screen
+      const marginX = 0.02;
+      const marginY = 0.02;
+      curvePoints.push({
+        x: (marginX + x * (1 - marginX * 2)) * W,
+        y: (marginY + y * (1 - marginY * 2)) * H
+      });
+    }
+  }
+  buildCurve();
+  window.addEventListener('resize', () => { buildCurve(); });
+
+  // Progress value 0..1 — driven by scroll
+  let progress = 0;
+  let targetProgress = 0;
+
+  // Draw the line up to the current progress
+  function drawLine() {
+    ctx.clearRect(0, 0, W, H);
+
+    if (progress <= 0.0001) {
+      // Nothing drawn yet
+      return;
+    }
+
+    const end = Math.floor(progress * (SAMPLES)) + 1;
+
+    // Draw three passes to give the line depth and warmth:
+    // 1. A soft wide underlayer (shadow/paper indent)
+    // 2. The main ink line
+    // 3. A highlight
+
+    // Pass 1 — soft underlayer
+    ctx.beginPath();
+    for (let i = 0; i <= end && i < curvePoints.length; i++) {
+      const p = curvePoints[i];
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.strokeStyle = 'rgba(120, 100, 60, 0.06)';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Pass 2 — main ink line, with slight taper near the leading tip
+    ctx.beginPath();
+    for (let i = 0; i <= end && i < curvePoints.length; i++) {
+      const p = curvePoints[i];
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    // A subtle gradient along the line — ink darkens as it "draws"
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, 'rgba(26, 23, 18, 0.85)');
+    grad.addColorStop(1, 'rgba(26, 23, 18, 0.55)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Pass 3 — the "pencil pressure" highlight, only near the leading edge
+    const tipStart = Math.max(0, end - 60);
+    ctx.beginPath();
+    for (let i = tipStart; i <= end && i < curvePoints.length; i++) {
+      const p = curvePoints[i];
+      if (i === tipStart) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.strokeStyle = 'rgba(224, 90, 58, 0.9)';
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // A small dot at the very tip — the "pencil point"
+    if (end > 0 && end < curvePoints.length) {
+      const tip = curvePoints[end];
+      ctx.beginPath();
+      ctx.arc(tip.x, tip.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(224, 90, 58, 0.95)';
+      ctx.fill();
+      // A soft halo around the tip
+      ctx.beginPath();
+      ctx.arc(tip.x, tip.y, 14, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(224, 90, 58, 0.08)';
+      ctx.fill();
+    }
+
+    // Draw tiny station marks — small dots at each key point passed
+    for (let s = 0; s < STATIONS.length; s++) {
+      const stationProgress = s / (STATIONS.length - 1);
+      if (stationProgress > progress) break;
+      // Approximate position from curvePoints at that index
+      const idx = Math.floor(stationProgress * SAMPLES);
+      const p = curvePoints[idx];
+      if (!p) continue;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(26, 23, 18, 0.15)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(26, 23, 18, 0.5)';
+      ctx.fill();
+    }
+  }
+
+  // ============================================================
+  // CONTENT REVEAL — blocks appear as the line passes their trigger
+  // ============================================================
+  const blocks = [
+    { el: document.getElementById('blockHero'),     trigger: 0.00 },
+    { el: document.getElementById('blockFrontend'), trigger: 0.20 },
+    { el: document.getElementById('blockBackend'),  trigger: 0.42 },
+    { el: document.getElementById('blockAdobe'),    trigger: 0.58 },
+    { el: document.getElementById('blockCopy'),     trigger: 0.76 },
+    { el: document.getElementById('blockClosing'),  trigger: 0.94 }
+  ];
+
+  function updateBlocks() {
+    blocks.forEach(b => {
+      // Trigger with a small fade-in window (appears over the span 0.05 of p)
+      const localP = (progress - b.trigger) / 0.06;
+      const clamped = Math.max(0, Math.min(1, localP));
+      b.el.style.opacity = clamped.toFixed(3);
+      // Also translate slightly as it appears
+      const ty = (1 - clamped) * 14;
+      b.el.style.transform = `translateY(${ty}px)`;
+      // Blur in
+      const blur = (1 - clamped) * 4;
+      b.el.style.filter = `blur(${blur}px)`;
+      // Make interactive once nearly fully visible
+      if (clamped > 0.85) b.el.classList.add('visible');
+      else b.el.classList.remove('visible');
+    });
+  }
+
+  // ============================================================
+  // PROGRESS UI
+  // ============================================================
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const instruction = document.getElementById('instruction');
+
+  function updateProgressUI() {
+    const pct = Math.round(progress * 100);
+    progressFill.style.height = pct + '%';
+    progressLabel.textContent = String(pct).padStart(2, '0') + '%';
+    if (progress > 0.02) instruction.classList.add('hide');
+    else instruction.classList.remove('hide');
+  }
+
+  // ============================================================
+  // SCROLL HANDLING
+  //
+  // Each wheel event moves targetProgress by a small amount.
+  // The render loop eases `progress` toward `targetProgress`
+  // so the line draws smoothly.
+  //
+  // Because we accumulate across the whole page, scrolling a
+  // little "draws" a little. Scrolling back "un-draws."
+  // ============================================================
+  let hasEntered = false;
+  const SENSITIVITY = 0.00085;
+
+  function handleWheel(e) {
+    if (!hasEntered) return;
+    e.preventDefault();
+
+    // Normalize delta (works with trackpads and mice)
+    let delta = e.deltaY;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) delta = e.deltaX;
+
+    targetProgress += delta * SENSITIVITY;
+    targetProgress = Math.max(0, Math.min(1, targetProgress));
+  }
+
+  // Keyboard
+  function handleKey(e) {
+    if (!hasEntered) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        enterExperience();
+      }
+      return;
+    }
+    const step = 0.06;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault();
+      targetProgress = Math.min(1, targetProgress + step);
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      targetProgress = Math.max(0, targetProgress - step);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      targetProgress = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      targetProgress = 1;
+    }
+  }
+
+  // Touch
+  let touchStartY = 0;
+  let touchStartProgress = 0;
+  function handleTouchStart(e) {
+    if (!hasEntered) return;
+    touchStartY = e.touches[0].clientY;
+    touchStartProgress = targetProgress;
+  }
+  function handleTouchMove(e) {
+    if (!hasEntered) return;
+    const t = e.touches[0];
+    const dy = touchStartY - t.clientY;
+    targetProgress = Math.max(0, Math.min(1, touchStartProgress + dy * 0.0018));
+    e.preventDefault();
+  }
+
+  // ============================================================
+  // ENTER
+  // ============================================================
+  const enterScreen = document.getElementById('enter');
+  const enterBtn = document.getElementById('enterBtn');
+
+  function enterExperience() {
+    if (hasEntered) return;
+    hasEntered = true;
+    enterScreen.classList.add('gone');
+  }
+  enterBtn.addEventListener('click', enterExperience);
+  enterBtn.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+  enterBtn.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+
+  const closingLink = document.querySelector('.closing-link');
+  if (closingLink) {
+    closingLink.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    closingLink.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  }
+
+  // ============================================================
+  // MAIN LOOP — ease progress, redraw, update UI, update blocks
+  // ============================================================
+  function loop() {
+    // Ease progress toward target
+    progress += (targetProgress - progress) * 0.12;
+    if (Math.abs(targetProgress - progress) < 0.0002) {
+      progress = targetProgress;
+    }
+    drawLine();
+    updateProgressUI();
+    updateBlocks();
+    requestAnimationFrame(loop);
+  }
+
+  // Init
+  buildCurve();
+  // Show hero immediately once entered
+  blocks[0].el.style.opacity = '1';
+  loop();
+
+  // ============================================================
+  // BIND
+  // ============================================================
+  window.addEventListener('wheel', handleWheel, { passive: false });
+  window.addEventListener('keydown', handleKey);
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+  // Prevent native scroll
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+
+})();
+</script>
+</body>
+</html>

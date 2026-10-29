@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucky Kumar — Inside the Shape</title>
+<style>
+  :root {
+    --bg: #140f1e;
+    --bg-deep: #0a0710;
+    --bg-warm: #1c1428;
+    --ink: #f3ece0;
+    --ink-soft: #c8bfd0;
+    --muted: #8b8297;
+
+    --magenta: #ff2d95;
+    --lime: #c6ff3a;
+    --coral: #ff5a4d;
+    --violet: #a27bff;
+    --electric: #00d4ff;
+    --sun: #ffbe0b;
+    --mint: #4eecc4;
+
+    --line: rgba(243, 236, 224, 0.10);
+    --line-strong: rgba(243, 236, 224, 0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    overflow: hidden;
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============================================================
+     CUSTOM CURSOR — core + 3 trailing orbs + a soft glow halo.
+     Nothing is static: the trails wander, the halo pulses.
+     ============================================================ */
+  .cursor-halo {
+    position: fixed; top: 0; left: 0;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9996;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(255,45,149,0.18) 0%, transparent 65%);
+    mix-blend-mode: screen;
+    transition: width .5s, height .5s, background .5s;
+    will-change: transform;
+  }
+
+  .cursor-trail {
+    position: fixed; top: 0; left: 0;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9997;
+    transform: translate(-50%,-50%);
+    mix-blend-mode: screen;
+    will-change: transform;
+    transition: width .3s, height .3s;
+    filter: blur(0.5px);
+  }
+  .cursor-trail.t1 { background: var(--magenta); opacity: .9; }
+  .cursor-trail.t2 { background: var(--electric); opacity: .8; }
+  .cursor-trail.t3 { background: var(--lime); opacity: .85; }
+
+  .cursor-core {
+    position: fixed; top: 0; left: 0;
+    width: 8px; height: 8px;
+    background: var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: width .2s, height .2s, background-color .2s;
+    will-change: transform;
+    box-shadow: 0 0 12px rgba(243, 236, 224, 0.4);
+  }
+
+  body.hovering .cursor-core {
+    width: 14px; height: 14px;
+    background: var(--magenta);
+    box-shadow: 0 0 24px rgba(255,45,149,0.8);
+  }
+  body.hovering .cursor-halo {
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(255,45,149,0.28) 0%, transparent 65%);
+  }
+  body.hovering .cursor-trail.t1 { width: 24px; height: 24px; }
+  body.hovering .cursor-trail.t2 { width: 22px; height: 22px; }
+  body.hovering .cursor-trail.t3 { width: 20px; height: 20px; }
+
+  body.clicking .cursor-core {
+    width: 18px; height: 18px;
+    background: var(--lime);
+    box-shadow: 0 0 30px rgba(198,255,58,0.9);
+  }
+
+  /* ============================================================
+     OUTER FRAME — the experience that contains the experience.
+     ============================================================ */
+  .outer-frame {
+    position: fixed; inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(10,7,16,0.35) 75%, rgba(10,7,16,0.7) 100%);
+  }
+  .outer-frame::before {
+    content: '';
+    position: absolute; inset: 22px;
+    border: 1px solid rgba(243,236,224,0.08);
+    border-radius: 2px;
+  }
+  .outer-frame::after {
+    content: '';
+    position: absolute; inset: 22px;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, var(--magenta) 0, var(--magenta) 24px, transparent 24px) top left / 100% 1px no-repeat,
+      linear-gradient(to bottom, var(--magenta) 0, var(--magenta) 24px, transparent 24px) top left / 1px 100% no-repeat,
+      linear-gradient(to left, var(--electric) 0, var(--electric) 24px, transparent 24px) top right / 100% 1px no-repeat,
+      linear-gradient(to bottom, var(--electric) 0, var(--electric) 24px, transparent 24px) top right / 1px 100% no-repeat,
+      linear-gradient(to right, var(--lime) 0, var(--lime) 24px, transparent 24px) bottom left / 100% 1px no-repeat,
+      linear-gradient(to top, var(--lime) 0, var(--lime) 24px, transparent 24px) bottom left / 1px 100% no-repeat,
+      linear-gradient(to left, var(--violet) 0, var(--violet) 24px, transparent 24px) bottom right / 100% 1px no-repeat,
+      linear-gradient(to top, var(--violet) 0, var(--violet) 24px, transparent 24px) bottom right / 1px 100% no-repeat;
+    opacity: 0.55;
+    animation: framePulse 6s ease-in-out infinite;
+  }
+  @keyframes framePulse {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 0.85; }
+  }
+
+  /* ============================================================
+     STAGE — inside the frame, a living world
+     ============================================================ */
+  .stage {
+    position: fixed; inset: 0;
+    overflow: hidden;
+  }
+
+  /* Ambient light that slowly breathes */
+  .stage-bg {
+    position: absolute; inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 45%, var(--bg-warm) 0%, var(--bg) 45%, var(--bg-deep) 100%);
+    animation: bgBreath 14s ease-in-out infinite;
+  }
+  @keyframes bgBreath {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.04); opacity: 0.92; }
+  }
+
+  /* Two slow drifting glows — like light sources in the room */
+  .stage-glow {
+    position: absolute;
+    width: 70vmax; height: 70vmax;
+    border-radius: 50%;
+    filter: blur(80px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform;
+  }
+  .stage-glow.g1 {
+    top: -20%; left: -10%;
+    background: radial-gradient(circle, rgba(255,45,149,0.22), transparent 65%);
+    animation: glow1 22s ease-in-out infinite alternate;
+  }
+  .stage-glow.g2 {
+    bottom: -25%; right: -15%;
+    background: radial-gradient(circle, rgba(0,212,255,0.18), transparent 65%);
+    animation: glow2 26s ease-in-out infinite alternate;
+  }
+  @keyframes glow1 {
+    0% { transform: translate(0,0) scale(1); }
+    100% { transform: translate(12vw, 8vh) scale(1.15); }
+  }
+  @keyframes glow2 {
+    0% { transform: translate(0,0) scale(1.1); }
+    100% { transform: translate(-10vw, -6vh) scale(0.95); }
+  }
+
+  /* Starfield — three parallax layers, each drifting at different speeds */
+  .stars {
+    position: absolute; inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  .stars canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* Floating dust motes — DOM particles for warmth */
+  .dust {
+    position: absolute; inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .mote {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--ink);
+    opacity: 0;
+    animation: moteFloat linear infinite;
+    will-change: transform, opacity;
+  }
+  @keyframes moteFloat {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    10% { opacity: 0.5; }
+    90% { opacity: 0.5; }
+    100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
+  }
+
+  /* ============================================================
+     GEOMETRY
+     ============================================================ */
+  .geo {
+    position: absolute;
+    top: 50%; left: 50%;
+    pointer-events: none;
+    will-change: transform, opacity;
+    transform-origin: center center;
+    z-index: 2;
+  }
+
+  .circle {
+    width: min(70vmin, 700px);
+    height: min(70vmin, 700px);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--magenta), #c41d70 70%, #7a1348 100%);
+    opacity: 0.88;
+    mix-blend-mode: screen;
+    filter: blur(0.3px);
+  }
+
+  .square {
+    width: min(48vmin, 480px);
+    height: min(48vmin, 480px);
+    background: linear-gradient(135deg, var(--electric), #0077aa);
+    opacity: 0.8;
+    mix-blend-mode: screen;
+    filter: blur(0.3px);
+  }
+
+  .triangle {
+    width: min(56vmin, 560px);
+    height: min(56vmin, 560px);
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    background: linear-gradient(160deg, var(--lime), #8fbf00);
+    opacity: 0.9;
+    mix-blend-mode: screen;
+    filter: blur(0.3px);
+  }
+
+  .ring {
+    width: min(52vmin, 520px);
+    height: min(52vmin, 520px);
+    border-radius: 50%;
+    border: min(3vmin, 30px) solid var(--violet);
+    mix-blend-mode: screen;
+    opacity: 0.75;
+    filter: blur(0.4px);
+  }
+
+  .dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    mix-blend-mode: screen;
+    filter: blur(0.3px);
+    box-shadow: 0 0 20px currentColor;
+  }
+  .arc {
+    width: min(80vmin, 800px);
+    height: min(80vmin, 800px);
+    border-radius: 50%;
+    border: 1px solid rgba(0,212,255,0.4);
+    mix-blend-mode: screen;
+  }
+
+  /* ============================================================
+     TEXT LAYERS
+     ============================================================ */
+  .text-layer {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    pointer-events: none;
+    will-change: transform, opacity;
+    padding: 6vw;
+    z-index: 3;
+  }
+  .text-layer .inner {
+    max-width: 700px;
+    pointer-events: auto;
+  }
+  .text-layer.align-right {
+    align-items: flex-end;
+    text-align: right;
+  }
+  .text-layer.align-right .inner { max-width: 540px; }
+  .text-layer.align-bottom {
+    justify-content: flex-end;
+    padding-bottom: 12vh;
+  }
+
+  .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .7rem;
+    letter-spacing: .4em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 24px; height: 2px;
+    background: var(--magenta);
+    box-shadow: 0 0 8px var(--magenta);
+  }
+  .align-right .eyebrow { justify-content: flex-end; }
+  .align-right .eyebrow::before { order: 2; }
+
+  .display {
+    font-size: clamp(3rem, 11vw, 9.5rem);
+    line-height: .9;
+    font-weight: 400;
+    letter-spacing: -.035em;
+    margin-bottom: 1.8rem;
+    color: var(--ink);
+    text-shadow: 0 0 40px rgba(255,45,149,0.15);
+  }
+  .display em {
+    font-style: italic;
+    color: var(--magenta);
+    text-shadow: 0 0 30px rgba(255,45,149,0.6);
+  }
+
+  .headline {
+    font-size: clamp(2.4rem, 7vw, 5.5rem);
+    line-height: .96;
+    font-weight: 400;
+    letter-spacing: -.03em;
+    margin-bottom: 1.4rem;
+    color: var(--ink);
+  }
+  .headline em { font-style: italic; }
+  .headline.magenta em { color: var(--magenta); text-shadow: 0 0 24px rgba(255,45,149,.5); }
+  .headline.electric em { color: var(--electric); text-shadow: 0 0 24px rgba(0,212,255,.5); }
+  .headline.lime em { color: var(--lime); text-shadow: 0 0 24px rgba(198,255,58,.5); }
+  .headline.violet em { color: var(--violet); text-shadow: 0 0 24px rgba(162,123,255,.5); }
+
+  .body {
+    max-width: 470px;
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+    line-height: 1.8;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300;
+  }
+  .body strong { color: var(--ink); font-weight: 500; }
+
+  .tags {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem 1.4rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .66rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .tags span {
+    padding: .35rem .9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 40px;
+    opacity: .9;
+  }
+  .align-right .tags { justify-content: flex-end; }
+
+  .attr {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .7rem;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2.2rem;
+  }
+
+  .quote {
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    line-height: 1.35;
+    font-weight: 400;
+    letter-spacing: -.01em;
+    max-width: 920px;
+    color: var(--ink);
+  }
+  .quote em {
+    font-style: italic;
+    color: var(--lime);
+    text-shadow: 0 0 24px rgba(198,255,58,.4);
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .74rem;
+    font-weight: 500;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 1.1rem 2.6rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 40px;
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+    transition: color .4s ease, border-color .4s ease;
+    cursor: none;
+    margin-top: 2.2rem;
+  }
+  .btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--magenta), var(--violet), var(--electric));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .5s cubic-bezier(.16,1,.3,1);
+    z-index: 0;
+  }
+  .btn:hover { color: #000; border-color: var(--magenta); }
+  .btn:hover::before { transform: scaleX(1); }
+  .btn span { position: relative; z-index: 1; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 300;
+    padding: 2.4rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+  .topbar a, .topbar .brand, .topbar .counter {
+    pointer-events: auto;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .7rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  .topbar .brand span {
+    color: var(--magenta);
+    text-shadow: 0 0 12px rgba(255,45,149,.6);
+  }
+
+  /* ============ PROGRESS ============ */
+  .progress {
+    position: fixed;
+    bottom: 2.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    display: flex;
+    gap: .8rem;
+    align-items: center;
+    padding: .7rem 1.4rem;
+    background: rgba(20,15,30,0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--line-strong);
+    border-radius: 40px;
+    pointer-events: auto;
+  }
+  .progress-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(243,236,224,0.2);
+    transition: all .5s cubic-bezier(.16,1,.3,1);
+    cursor: none;
+    border: none;
+    padding: 0;
+  }
+  .progress-dot:nth-child(1).active { background: var(--magenta); transform: scale(1.5); box-shadow: 0 0 12px var(--magenta); }
+  .progress-dot:nth-child(2).active { background: var(--magenta); transform: scale(1.5); box-shadow: 0 0 12px var(--magenta); }
+  .progress-dot:nth-child(3).active { background: var(--electric); transform: scale(1.5); box-shadow: 0 0 12px var(--electric); }
+  .progress-dot:nth-child(4).active { background: var(--lime); transform: scale(1.5); box-shadow: 0 0 12px var(--lime); }
+  .progress-dot:nth-child(5).active { background: var(--violet); transform: scale(1.5); box-shadow: 0 0 12px var(--violet); }
+  .progress-dot:nth-child(6).active { background: var(--sun); transform: scale(1.5); box-shadow: 0 0 12px var(--sun); }
+  .progress-dot:nth-child(7).active { background: var(--coral); transform: scale(1.5); box-shadow: 0 0 12px var(--coral); }
+
+  /* ============ HINT ============ */
+  .hint {
+    position: fixed;
+    bottom: 2.7rem;
+    left: 3rem;
+    z-index: 300;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .62rem;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    transition: opacity .6s ease;
+  }
+  .hint-line {
+    width: 40px; height: 1.5px;
+    background: rgba(243,236,224,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .hint-line::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--magenta), var(--electric));
+    animation: hintSlide 2.4s ease-in-out infinite;
+  }
+  @keyframes hintSlide {
+    0%,100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+  }
+  .hint.hide { opacity: 0; pointer-events: none; }
+
+  /* ============ LEGEND ============ */
+  .legend {
+    position: fixed;
+    top: 50%;
+    right: 2.8rem;
+    transform: translateY(-50%);
+    z-index: 250;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .6rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity .8s ease;
+    pointer-events: none;
+  }
+  .legend.show { opacity: 1; }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    justify-content: flex-end;
+  }
+  .legend-swatch {
+    width: 12px; height: 12px;
+    flex-shrink: 0;
+  }
+  .swatch-circle { background: var(--magenta); border-radius: 50%; box-shadow: 0 0 10px var(--magenta); }
+  .swatch-square { background: var(--electric); box-shadow: 0 0 10px var(--electric); }
+  .swatch-triangle { background: var(--lime); clip-path: polygon(50% 0%, 100% 100%, 0% 100%); box-shadow: 0 0 10px var(--lime); }
+  .swatch-ring { border: 3px solid var(--violet); border-radius: 50%; background: transparent; box-shadow: 0 0 10px var(--violet); }
+
+  @media (max-width: 768px) {
+    .legend { display: none; }
+    .text-layer { padding: 8vw 6vw; }
+    .topbar { padding: 1.5rem 1.6rem; }
+    .hint { left: 1.6rem; bottom: 1.8rem; font-size: .55rem; }
+    .progress { bottom: 1.6rem; padding: .55rem 1.1rem; gap: .65rem; }
+    .outer-frame::before { inset: 14px; }
+    .outer-frame::after { inset: 14px; }
+    .cursor-trail, .cursor-halo { display: none; }
+  }
+
+  /* ============ ENTER SCREEN ============ */
+  .enter-screen {
+    position: fixed; inset: 0;
+    z-index: 500;
+    background: var(--bg-deep);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.2rem;
+    transition: opacity 1.2s cubic-bezier(.16,1,.3,1), visibility 1.2s;
+  }
+  .enter-screen.gone {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .enter-screen::before {
+    content: '';
+    position: absolute; inset: 22px;
+    border: 1px solid rgba(243,236,224,0.08);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .enter-screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(10,7,16,0.6) 100%);
+    pointer-events: none;
+  }
+  .enter-shapes {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+  .enter-shapes > div {
+    width: 28px; height: 28px;
+    animation: bob 3s ease-in-out infinite;
+  }
+  .enter-shapes .s1 { background: var(--magenta); border-radius: 50%; animation-delay: 0s; box-shadow: 0 0 20px var(--magenta); }
+  .enter-shapes .s2 { background: var(--electric); animation-delay: .3s; box-shadow: 0 0 20px var(--electric); }
+  .enter-shapes .s3 { background: var(--lime); clip-path: polygon(50% 0%, 100% 100%, 0% 100%); animation-delay: .6s; box-shadow: 0 0 20px var(--lime); }
+  .enter-shapes .s4 { border: 4px solid var(--violet); border-radius: 50%; animation-delay: .9s; box-shadow: 0 0 20px var(--violet); }
+  @keyframes bob {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .enter-brand {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    text-align: center;
+    color: var(--ink);
+    position: relative;
+    z-index: 1;
+  }
+  .enter-brand em {
+    font-style: italic;
+    color: var(--magenta);
+    text-shadow: 0 0 30px rgba(255,45,149,.6);
+  }
+  .enter-sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .68rem;
+    letter-spacing: .38em;
+    text-transform: uppercase;
+    color: var(--muted);
+    position: relative;
+    z-index: 1;
+  }
+  .enter-btn {
+    margin-top: .6rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: .74rem;
+    font-weight: 500;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    padding: 1rem 2.6rem;
+    border-radius: 40px;
+    cursor: none;
+    transition: all .4s ease;
+    position: relative;
+    z-index: 1;
+  }
+  .enter-btn:hover {
+    background: var(--magenta);
+    color: #000;
+    border-color: var(--magenta);
+    letter-spacing: .3em;
+    box-shadow: 0 0 30px rgba(255,45,149,.6);
+  }
+</style>
+</head>
+<body>
+
+  <!-- Cursor: halo + core + three trailing orbs -->
+  <div class="cursor-halo" id="cursorHalo"></div>
+  <div class="cursor-trail t3" id="trail3"></div>
+  <div class="cursor-trail t2" id="trail2"></div>
+  <div class="cursor-trail t1" id="trail1"></div>
+  <div class="cursor-core" id="cursorCore"></div>
+
+  <!-- Outer frame -->
+  <div class="outer-frame"></div>
+
+  <!-- Enter Screen -->
+  <div class="enter-screen" id="enterScreen">
+    <div class="enter-shapes">
+      <div class="s1"></div><div class="s2"></div><div class="s3"></div><div class="s4"></div>
+    </div>
+    <div class="enter-brand">Lucky <em>Kumar</em></div>
+    <div class="enter-sub">Inside the Shape</div>
+    <button class="enter-btn" id="enterBtn">Enter</button>
+  </div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <a href="#" class="brand" id="brand">Lucky <span>Kumar</span></a>
+    <span class="counter" id="counter">01 / 07</span>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend" id="legend">
+    <div class="legend-item"><span>Frontend</span><span class="legend-swatch swatch-circle"></span></div>
+    <div class="legend-item"><span>Backend</span><span class="legend-swatch swatch-square"></span></div>
+    <div class="legend-item"><span>Adobe</span><span class="legend-swatch swatch-triangle"></span></div>
+    <div class="legend-item"><span>Copywriting</span><span class="legend-swatch swatch-ring"></span></div>
+  </div>
+
+  <!-- STAGE -->
+  <div class="stage" id="stage">
+
+    <!-- Living background layers -->
+    <div class="stage-bg"></div>
+    <div class="stage-glow g1"></div>
+    <div class="stage-glow g2"></div>
+
+    <!-- Starfield canvas (JS-driven, parallax) -->
+    <div class="stars"><canvas id="starsCanvas"></canvas></div>
+
+    <!-- Dust motes (DOM particles) -->
+    <div class="dust" id="dust"></div>
+
+    <!-- Geometry — each shape has meaning -->
+    <div class="geo circle" id="circle1"></div>
+    <div class="geo circle" id="circle2" style="width:min(34vmin,340px);height:min(34vmin,340px);background:radial-gradient(circle at 35% 30%, var(--sun), #b07a00);opacity:.7;"></div>
+    <div class="geo square" id="square"></div>
+    <div class="geo triangle" id="triangle"></div>
+    <div class="geo ring" id="ring"></div>
+    <div class="geo arc" id="arc"></div>
+    <div class="geo dot" id="dot1" style="background:var(--coral);color:var(--coral);"></div>
+    <div class="geo dot" id="dot2" style="background:var(--electric);color:var(--electric);"></div>
+
+    <!-- TEXT LAYERS -->
+    <div class="text-layer" data-layer="0">
+      <div class="inner">
+        <p class="eyebrow">Frontend · Backend · Adobe · Copy</p>
+        <h1 class="display">Lucky<br>Kumar<em>.</em></h1>
+        <p class="body">
+          A developer and writer working where <strong>engineering precision</strong>
+          meets <strong>editorial craft</strong>. Four shapes, one point of view.
+        </p>
+      </div>
+    </div>
+
+    <div class="text-layer align-right" data-layer="1">
+      <div class="inner">
+        <p class="eyebrow">01 — Frontend</p>
+        <h2 class="headline magenta">The <em>surface</em><br>of things.</h2>
+        <p class="body" style="margin-left:auto;">
+          A circle has no edges to hide behind. Interfaces should feel the same —
+          clean semantics, fluid motion, performance that stays out of the way.
+        </p>
+        <div class="tags" style="justify-content:flex-end;">
+          <span>HTML · CSS · JS</span>
+          <span>Motion</span>
+          <span>Accessibility</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-layer" data-layer="2">
+      <div class="inner">
+        <p class="eyebrow">02 — Backend</p>
+        <h2 class="headline electric">The <em>structure</em><br>underneath.</h2>
+        <p class="body">
+          A square is the quietest, most reliable shape. It holds things up.
+          APIs, data models, architecture — the invisible frame the rest of the work rests on.
+        </p>
+        <div class="tags">
+          <span>APIs</span>
+          <span>Databases</span>
+          <span>Auth</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-layer align-right" data-layer="3">
+      <div class="inner">
+        <p class="eyebrow">03 — Adobe Suite</p>
+        <h2 class="headline lime">The <em>form</em><br>of feeling.</h2>
+        <p class="body" style="margin-left:auto;">
+          A triangle points forward — it has direction and tension. That's what
+          composition is: tension made intentional.
+        </p>
+        <div class="tags" style="justify-content:flex-end;">
+          <span>Photoshop</span>
+          <span>Illustrator</span>
+          <span>Brand</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-layer" data-layer="4">
+      <div class="inner">
+        <p class="eyebrow">04 — Copywriting</p>
+        <h2 class="headline violet">The <em>voice</em><br>of the thing.</h2>
+        <p class="body">
+          A ring is continuous — you can't tell where it starts or ends. Good
+          writing has that same flow. Every headline, every line of microcopy —
+          written to be read, not skimmed.
+        </p>
+        <div class="tags">
+          <span>Headlines</span>
+          <span>Microcopy</span>
+          <span>Story</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-layer align-bottom" data-layer="5">
+      <div class="inner" style="max-width:1000px;">
+        <p class="quote">
+          A jack of all trades is rarely a master of none — when the trades
+          <em>inform each other</em>, the work becomes something none of them
+          could produce alone.
+        </p>
+        <p class="attr">Lucky Kumar — on the value of range</p>
+      </div>
+    </div>
+
+    <div class="text-layer align-right" data-layer="6">
+      <div class="inner">
+        <p class="eyebrow">Get in touch</p>
+        <h2 class="headline magenta">Let's build<br>something <em>considered.</em></h2>
+        <p class="body" style="margin-left:auto;">
+          Open to thoughtful projects, collaborations, and conversations.
+          Reach out — I reply to everything.
+        </p>
+        <a href="mailto:hello@luckykumar.dev" class="btn"><span>Contact</span></a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Progress -->
+  <div class="progress" id="progress"></div>
+
+  <!-- Hint -->
+  <div class="hint" id="hint">
+    <div class="hint-line"></div>
+    <span>Scroll to compose</span>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ============================================================
+  // CUSTOM CURSOR — halo + core + 3 trailing orbs
+  // Nothing is static: trails wander with independent easing,
+  // and the halo subtly drifts to create a living bloom.
+  // ============================================================
+  const core = document.getElementById('cursorCore');
+  const halo = document.getElementById('cursorHalo');
+  const trail1 = document.getElementById('trail1');
+  const trail2 = document.getElementById('trail2');
+  const trail3 = document.getElementById('trail3');
+
+  let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+  let t1x = mouseX, t1y = mouseY;
+  let t2x = mouseX, t2y = mouseY;
+  let t3x = mouseX, t3y = mouseY;
+  let hx = mouseX, hy = mouseY;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+  });
+
+  let time = 0;
+  function animateCursor() {
+    time += 0.016;
+
+    core.style.left = mouseX + 'px';
+    core.style.top = mouseY + 'px';
+
+    // Halo — drifts toward pointer with a small wander
+    hx += (mouseX - hx) * 0.08;
+    hy += (mouseY - hy) * 0.08;
+    const wanderX = Math.sin(time * 0.9) * 6;
+    const wanderY = Math.cos(time * 0.7) * 6;
+    halo.style.left = (hx + wanderX) + 'px';
+    halo.style.top = (hy + wanderY) + 'px';
+
+    // Trails with different lags and micro-wander
+    t1x += (mouseX - t1x) * 0.14;
+    t1y += (mouseY - t1y) * 0.14;
+    trail1.style.left = (t1x + Math.sin(time * 1.7) * 3) + 'px';
+    trail1.style.top = (t1y + Math.cos(time * 1.5) * 3) + 'px';
+
+    t2x += (mouseX - t2x) * 0.09;
+    t2y += (mouseY - t2y) * 0.09;
+    trail2.style.left = (t2x + Math.cos(time * 1.3) * 4) + 'px';
+    trail2.style.top = (t2y + Math.sin(time * 1.1) * 4) + 'px';
+
+    t3x += (mouseX - t3x) * 0.05;
+    t3y += (mouseY - t3y) * 0.05;
+    trail3.style.left = (t3x + Math.sin(time * 0.9) * 5) + 'px';
+    trail3.style.top = (t3y + Math.cos(time * 0.7) * 5) + 'px';
+
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button, .progress-dot').forEach((el) => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  });
+  document.addEventListener('mousedown', () => document.body.classList.add('clicking'));
+  document.addEventListener('mouseup', () => document.body.classList.remove('clicking'));
+  document.addEventListener('mouseleave', () => {
+    [core, halo, trail1, trail2, trail3].forEach(el => el.style.opacity = '0');
+  });
+  document.addEventListener('mouseenter', () => {
+    [core, halo, trail1, trail2, trail3].forEach(el => el.style.opacity = '1');
+  });
+
+  // ============================================================
+  // STARFIELD CANVAS — multi-layer parallax stars drifting slowly
+  // ============================================================
+  const starsCanvas = document.getElementById('starsCanvas');
+  const sctx = starsCanvas.getContext('2d');
+  let starW, starH;
+  let starLayers = [];
+
+  function resizeStars() {
+    starW = window.innerWidth;
+    starH = window.innerHeight;
+    starsCanvas.width = starW;
+    starsCanvas.height = starH;
+    starLayers = [
+      { count: 90, speed: 0.008, size: 0.8, alpha: 0.35, stars: [] },
+      { count: 60, speed: 0.018, size: 1.1, alpha: 0.55, stars: [] },
+      { count: 30, speed: 0.032, size: 1.5, alpha: 0.85, stars: [] }
+    ];
+    starLayers.forEach(layer => {
+      layer.stars = [];
+      for (let i = 0; i < layer.count; i++) {
+        layer.stars.push({
+          x: Math.random() * starW,
+          y: Math.random() * starH,
+          twinkle: Math.random() * Math.PI * 2,
+          twinkleSpeed: 0.01 + Math.random() * 0.02
+        });
+      }
+    });
+  }
+  resizeStars();
+  window.addEventListener('resize', resizeStars);
+
+  let starTime = 0;
+  function drawStars() {
+    starTime += 1;
+    sctx.clearRect(0, 0, starW, starH);
+
+    starLayers.forEach(layer => {
+      layer.stars.forEach(s => {
+        // Slow drift upward and sideways
+        s.x += layer.speed * 0.5;
+        s.y -= layer.speed;
+        if (s.x > starW) s.x = 0;
+        if (s.y < 0) s.y = starH;
+
+        s.twinkle += s.twinkleSpeed;
+        const alpha = layer.alpha * (0.6 + 0.4 * Math.sin(s.twinkle));
+
+        sctx.beginPath();
+        sctx.arc(s.x, s.y, layer.size, 0, Math.PI * 2);
+        sctx.fillStyle = `rgba(243, 236, 224, ${alpha})`;
+        sctx.fill();
+      });
+    });
+
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  // ============================================================
+  // DUST MOTES — gentle floating particles (DOM)
+  // ============================================================
+  const dust = document.getElementById('dust');
+  const MOTES = 24;
+  for (let i = 0; i < MOTES; i++) {
+    const m = document.createElement('div');
+    m.className = 'mote';
+    const size = 1 + Math.random() * 2.5;
+    m.style.width = size + 'px';
+    m.style.height = size + 'px';
+    m.style.left = Math.random() * 100 + '%';
+    m.style.top = (100 + Math.random() * 30) + '%';
+    m.style.animationDuration = (18 + Math.random() * 22) + 's';
+    m.style.animationDelay = (-Math.random() * 30) + 's';
+    m.style.opacity = 0.2 + Math.random() * 0.4;
+    dust.appendChild(m);
+  }
+
+  // ============================================================
+  // GEOMETRY + SCROLL SYSTEM
+  // ============================================================
+  const circle1 = document.getElementById('circle1');
+  const circle2 = document.getElementById('circle2');
+  const square = document.getElementById('square');
+  const triangle = document.getElementById('triangle');
+  const ringShape = document.getElementById('ring');
+  const arc = document.getElementById('arc');
+  const dot1 = document.getElementById('dot1');
+  const dot2 = document.getElementById('dot2');
+  const textLayers = Array.from(document.querySelectorAll('.text-layer'));
+
+  const TOTAL = textLayers.length;
+  let current = 0;
+  let position = 0;
+  let isAnimating = false;
+  let hasEntered = false;
+  let accumulated = 0;
+  let idleTimer = null;
+  const THRESHOLD = 90;
+
+  const counter = document.getElementById('counter');
+  const progressEl = document.getElementById('progress');
+  const hint = document.getElementById('hint');
+  const legend = document.getElementById('legend');
+  const enterScreen = document.getElementById('enterScreen');
+  const enterBtn = document.getElementById('enterBtn');
+
+  for (let i = 0; i < TOTAL; i++) {
+    const b = document.createElement('button');
+    b.className = 'progress-dot' + (i === 0 ? ' active' : '');
+    b.setAttribute('aria-label', 'Scene ' + (i + 1));
+    b.addEventListener('click', () => goTo(i));
+    b.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    b.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+    progressEl.appendChild(b);
+  }
+  const dots = progressEl.querySelectorAll('.progress-dot');
+
+  function updateMeta() {
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
+  }
+
+  // ============================================================
+  // MAIN RENDER LOOP
+  // Scroll position + a living time variable combine to drive
+  // every shape. Even when the user doesn't scroll, geometry
+  // keeps breathing, drifting, and rotating.
+  // ============================================================
+  let liveTime = 0;
+
+  function render(p) {
+    function focus(n) {
+      return Math.max(0, 1 - Math.abs(p - n));
+    }
+
+    // Continuous ambient time — makes everything alive
+    liveTime += 0.006;
+
+    const t = liveTime;
+    const breath = Math.sin(t * 1.2) * 0.5 + 0.5; // 0..1
+
+    // --- CIRCLE 1 (Frontend) ---
+    const f1 = focus(1);
+    const c1Scale = 0.55 + f1 * 0.85 + Math.sin(t * 0.9) * 0.04;
+    const c1X = Math.sin(p * 1.3 + t * 0.4) * 8;
+    const c1Y = Math.cos(p * 1.1 + t * 0.3) * 6;
+    circle1.style.transform =
+      `translate(-50%, -50%) translate(${c1X}vw, ${c1Y}vh) rotate(${p * 30 + t * 12}deg) scale(${c1Scale})`;
+    circle1.style.opacity = 0.55 + f1 * 0.4;
+
+    // --- CIRCLE 2 (accent) — orbits continuously ---
+    const c2X = Math.sin(p * 0.9 + t * 0.6 + 1.2) * 26;
+    const c2Y = Math.cos(p * 1.4 + t * 0.5 + 0.7) * 20;
+    const c2Scale = 0.9 + Math.sin(t * 1.3 + p * 2) * 0.2;
+    circle2.style.transform =
+      `translate(-50%, -50%) translate(${c2X}vw, ${c2Y}vh) scale(${c2Scale}) rotate(${t * 20}deg)`;
+
+    // --- SQUARE (Backend) ---
+    const f2 = focus(2);
+    const sqScale = 0.5 + f2 * 0.9 + Math.sin(t * 0.8 + 1) * 0.03;
+    const sqRot = p * 22 + f2 * 45 + t * 18;
+    const sqX = Math.sin(p * 0.8 + t * 0.5 + 2) * 14;
+    const sqY = Math.cos(p * 1.0 + t * 0.4 + 1) * 10;
+    square.style.transform =
+      `translate(-50%, -50%) translate(${sqX}vw, ${sqY}vh) rotate(${sqRot}deg) scale(${sqScale})`;
+    square.style.opacity = 0.5 + f2 * 0.45;
+
+    // --- TRIANGLE (Adobe) ---
+    const f3 = focus(3);
+    const triScale = 0.5 + f3 * 0.8 + Math.sin(t * 1.1) * 0.04;
+    const triRot = p * 40 + f3 * 90 + t * 25;
+    const triX = Math.sin(p * 1.1 + t * 0.6 + 3) * 18;
+    const triY = Math.cos(p * 0.9 + t * 0.5 + 2) * 12;
+    triangle.style.transform =
+      `translate(-50%, -50%) translate(${triX}vw, ${triY}vh) rotate(${triRot}deg) scale(${triScale})`;
+    triangle.style.opacity = 0.55 + f3 * 0.4;
+
+    // --- RING (Copywriting) ---
+    const f4 = focus(4);
+    const ringScale = 0.5 + f4 * 0.85 + Math.sin(t * 0.9 + 2) * 0.04;
+    const ringRot = -p * 35 - f4 * 60 - t * 22;
+    const ringX = Math.sin(p * 1.2 + t * 0.55 + 4) * 16;
+    const ringY = Math.cos(p * 1.3 + t * 0.45 + 3) * 12;
+    ringShape.style.transform =
+      `translate(-50%, -50%) translate(${ringX}vw, ${ringY}vh) rotate(${ringRot}deg) scale(${ringScale})`;
+    ringShape.style.opacity = 0.55 + f4 * 0.4;
+
+    // --- ARC (connective flourish) ---
+    arc.style.transform =
+      `translate(-50%, -50%) rotate(${p * 15 + t * 8}deg) scale(${1 + Math.sin(t * 1.5 + p) * 0.1})`;
+    arc.style.opacity = 0.22 + Math.sin(t * 0.8) * 0.08;
+
+    // --- DOTS (orbit, always moving) ---
+    dot1.style.transform =
+      `translate(-50%, -50%) translate(${Math.sin(p * 1.6 + t * 0.7) * 38}vw, ${Math.cos(p * 1.2 + t * 0.6) * 30}vh)`;
+    dot2.style.transform =
+      `translate(-50%, -50%) translate(${Math.cos(p * 1.3 + t * 0.5) * 34}vw, ${Math.sin(p * 1.7 + t * 0.8) * 28}vh)`;
+
+    // --- TEXT LAYERS ---
+    textLayers.forEach((layer, i) => {
+      const dist = p - i;
+      const absDist = Math.abs(dist);
+      let opacity = Math.max(0, 1 - absDist * 1.15);
+      if (absDist > 0.95) opacity = 0;
+      const translateY = dist * 16;
+      const scale = 1 - Math.min(absDist, 1) * 0.04;
+      const blur = Math.min(absDist * 4, 5);
+      layer.style.opacity = opacity;
+      layer.style.transform = `translateY(${translateY}vh) scale(${scale})`;
+      layer.style.filter = `blur(${blur}px)`;
+      layer.style.pointerEvents = absDist < 0.15 ? 'auto' : 'none';
+    });
+
+    requestAnimationFrame(() => render(position));
+  }
+
+  // Kick off the perpetual render loop
+  render(0);
+
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+  function goTo(index) {
+    if (isAnimating || index === current) return;
+    if (index < 0 || index >= TOTAL) return;
+
+    isAnimating = true;
+    hint.classList.add('hide');
+
+    const startPos = position;
+    const endPos = index;
+    const startTime = performance.now();
+    const duration = Math.min(1100, 700 + Math.abs(endPos - startPos) * 120);
+
+    function step(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      position = startPos + (endPos - startPos) * e;
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        current = index;
+        position = index;
+        updateMeta();
+        isAnimating = false;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ============================================================
+  // WHEEL
+  // ============================================================
+  function handleWheel(e) {
+    if (!hasEntered) return;
+    e.preventDefault();
+    if (isAnimating) return;
+
+    let delta = e.deltaY;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) delta = e.deltaX;
+    accumulated += delta;
+
+    const previewFraction = Math.max(-1, Math.min(1, accumulated / THRESHOLD));
+    position = current + previewFraction * 0.6;
+
+    if (Math.abs(accumulated) >= THRESHOLD) {
+      const dir = accumulated > 0 ? 1 : -1;
+      const next = Math.max(0, Math.min(TOTAL - 1, current + dir));
+      if (next !== current) {
+        accumulated = 0;
+        goTo(next);
+      } else {
+        accumulated = 0;
+        animateBackToCurrent();
+      }
+    }
+
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (isAnimating) return;
+      accumulated = 0;
+      animateBackToCurrent();
+    }, 160);
+  }
+
+  function animateBackToCurrent() {
+    if (isAnimating) return;
+    if (Math.abs(position - current) < 0.01) {
+      position = current;
+      return;
+    }
+    isAnimating = true;
+    const startPos = position;
+    const endPos = current;
+    const startTime = performance.now();
+    const duration = 500;
+
+    function step(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      const e = 1 - Math.pow(1 - t, 3);
+      position = startPos + (endPos - startPos) * e;
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        position = current;
+        isAnimating = false;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ============================================================
+  // KEYBOARD
+  // ============================================================
+  function handleKey(e) {
+    if (!hasEntered) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterExperience(); }
+      return;
+    }
+    if (isAnimating) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault(); goTo(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault(); goTo(current - 1);
+    } else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(TOTAL - 1); }
+  }
+
+  // ============================================================
+  // TOUCH
+  // ============================================================
+  let touchStartX = 0, touchStartY = 0, touchMoved = false;
+
+  function handleTouchStart(e) {
+    if (!hasEntered) return;
+    const t = e.touches[0];
+    touchStartX = t.clientX; touchStartY = t.clientY;
+    touchMoved = false;
+  }
+  function handleTouchMove(e) {
+    if (!hasEntered || isAnimating) return;
+    const t = e.touches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) touchMoved = true;
+    const drag = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    position = current + Math.max(-1, Math.min(1, drag / 200)) * 0.6;
+    if (Math.abs(dx) > Math.abs(dy)) e.preventDefault();
+  }
+  function handleTouchEnd(e) {
+    if (!hasEntered || isAnimating) return;
+    if (!touchMoved) { animateBackToCurrent(); return; }
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+      dx < 0 ? goTo(current + 1) : goTo(current - 1);
+    } else if (Math.abs(dy) > 60) {
+      dy < 0 ? goTo(current + 1) : goTo(current - 1);
+    } else {
+      animateBackToCurrent();
+    }
+  }
+
+  // ============================================================
+  // ENTER
+  // ============================================================
+  function enterExperience() {
+    if (hasEntered) return;
+    hasEntered = true;
+    enterScreen.classList.add('gone');
+    setTimeout(() => {
+      legend.classList.add('show');
+      position = 0;
+      updateMeta();
+    }, 100);
+  }
+  enterBtn.addEventListener('click', enterExperience);
+
+  // ============================================================
+  // BIND
+  // ============================================================
+  window.addEventListener('wheel', handleWheel, { passive: false });
+  window.addEventListener('keydown', handleKey);
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTouchEnd, { passive: true });
+  document.getElementById('brand').addEventListener('click', (e) => {
+    e.preventDefault();
+    goTo(0);
+  });
+
+  updateMeta();
+
+})();
+</script>
+</body>
+</html>

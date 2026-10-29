@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucky Kumar — Frontend · Backend · Adobe · Copy</title>
+<style>
+  :root {
+    --paper: #f4f0e8;
+    --paper-2: #ece6da;
+    --ink: #1c1b18;
+    --ink-soft: #4a4741;
+    --muted: #8a857c;
+    --accent: #b8894a;
+    --accent-soft: rgba(184, 137, 74, 0.14);
+    --hairline: rgba(28, 27, 24, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    overflow: hidden;
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ CUSTOM CURSOR — refined, thin, elegant ============ */
+  .cursor-dot {
+    position: fixed; top: 0; left: 0;
+    width: 6px; height: 6px;
+    background: var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%,-50%);
+    transition: width .3s ease, height .3s ease, background-color .3s ease;
+    will-change: transform;
+  }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(28,27,24,0.35);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: width .4s cubic-bezier(.16,1,.3,1),
+                height .4s cubic-bezier(.16,1,.3,1),
+                border-color .3s ease;
+    will-change: transform;
+  }
+  body.hovering .cursor-dot {
+    width: 10px; height: 10px;
+    background: var(--accent);
+  }
+  body.hovering .cursor-ring {
+    width: 56px; height: 56px;
+    border-color: var(--accent);
+  }
+  body.clicking .cursor-ring {
+    width: 22px; height: 22px;
+  }
+
+  /* ============ CANVAS — the line field lives here ============ */
+  canvas#lineCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* A very faint paper grain over the whole scene */
+  .grain {
+    position: fixed; inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/></svg>");
+  }
+
+  /* ============ TEXT LAYERS ============ */
+  .text-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8vw;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .text-layer .inner {
+    max-width: 620px;
+    pointer-events: auto;
+  }
+  .text-layer.align-right {
+    align-items: flex-end;
+    text-align: right;
+  }
+  .text-layer.align-right .inner { max-width: 500px; }
+  .text-layer.align-bottom {
+    justify-content: flex-end;
+    padding-bottom: 14vh;
+    align-items: center;
+    text-align: center;
+  }
+  .text-layer.align-bottom .inner { max-width: 900px; }
+
+  .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .align-right .eyebrow { justify-content: flex-end; }
+  .align-right .eyebrow::before { order: 2; }
+  .align-bottom .eyebrow { justify-content: center; }
+  .align-bottom .eyebrow::before { order: 0; }
+
+  .display {
+    font-size: clamp(3rem, 10.5vw, 9rem);
+    line-height: 0.92;
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    margin-bottom: 2rem;
+    color: var(--ink);
+  }
+  .display em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .headline {
+    font-size: clamp(2.2rem, 6.2vw, 4.8rem);
+    line-height: 0.98;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    margin-bottom: 1.6rem;
+    color: var(--ink);
+  }
+  .headline em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .body {
+    max-width: 440px;
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+    line-height: 1.85;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300;
+  }
+  .body strong { color: var(--ink); font-weight: 500; }
+  .align-right .body { margin-left: auto; }
+  .align-bottom .body { margin: 0 auto; text-align: center; }
+
+  .tags {
+    margin-top: 2.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.6rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.64rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .tags span { opacity: 0.9; }
+  .align-right .tags { justify-content: flex-end; }
+
+  .quote {
+    font-size: clamp(1.6rem, 3.8vw, 2.8rem);
+    line-height: 1.4;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    max-width: 880px;
+    margin: 0 auto;
+    color: var(--ink);
+  }
+  .quote em { font-style: italic; color: var(--accent); }
+
+  .attr {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2.4rem;
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 1.1rem 2.8rem;
+    border: 1px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s ease;
+    cursor: none;
+    margin-top: 2.6rem;
+    background: transparent;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.5s cubic-bezier(.16,1,.3,1);
+    z-index: 0;
+  }
+  .btn:hover { color: var(--paper); }
+  .btn:hover::before { transform: scaleY(1); }
+  .btn span { position: relative; z-index: 1; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 2.2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+  .topbar a, .topbar .brand, .topbar .counter {
+    pointer-events: auto;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .topbar .brand span { color: var(--accent); }
+
+  /* ============ PROGRESS — thin elegant lines ============ */
+  .progress {
+    position: fixed;
+    bottom: 2.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 0.7rem;
+    align-items: center;
+    pointer-events: auto;
+    padding: 0.9rem 1.6rem;
+    background: rgba(244, 240, 232, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 40px;
+    border: 1px solid var(--hairline);
+  }
+  .progress-dot {
+    width: 22px;
+    height: 1.5px;
+    border-radius: 1px;
+    background: rgba(28, 27, 24, 0.18);
+    transition: all 0.5s cubic-bezier(.16,1,.3,1);
+    cursor: none;
+    border: none;
+    padding: 0;
+  }
+  .progress-dot.active {
+    background: var(--accent);
+    width: 40px;
+  }
+
+  /* ============ HINT ============ */
+  .hint {
+    position: fixed;
+    bottom: 2.8rem;
+    left: 3rem;
+    z-index: 100;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: opacity 0.6s ease;
+  }
+  .hint-line {
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+    position: relative;
+    overflow: hidden;
+  }
+  .hint-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    animation: hintSlide 2.6s ease-in-out infinite;
+  }
+  @keyframes hintSlide {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+  }
+  .hint.hide { opacity: 0; pointer-events: none; }
+
+  /* ============ ENTER SCREEN ============ */
+  .enter-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    transition: opacity 1.2s cubic-bezier(.16,1,.3,1), visibility 1.2s;
+  }
+  .enter-screen.gone {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .enter-eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .enter-brand {
+    font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: var(--ink);
+  }
+  .enter-brand em { font-style: italic; color: var(--accent); }
+  .enter-rule {
+    width: 60px;
+    height: 1px;
+    background: var(--ink);
+    opacity: 0.4;
+  }
+  .enter-sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    max-width: 340px;
+    line-height: 1.9;
+  }
+  .enter-btn {
+    margin-top: 1rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--ink);
+    padding: 1.1rem 3rem;
+    cursor: none;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .enter-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.5s cubic-bezier(.16,1,.3,1);
+    z-index: 0;
+  }
+  .enter-btn:hover { color: var(--paper); }
+  .enter-btn:hover::before { transform: scaleY(1); }
+  .enter-btn span { position: relative; z-index: 1; }
+
+  @media (max-width: 768px) {
+    .text-layer { padding: 8vw 6vw; }
+    .topbar { padding: 1.6rem 1.6rem; }
+    .hint { left: 1.6rem; bottom: 1.8rem; font-size: 0.55rem; }
+    .progress { bottom: 1.6rem; padding: 0.7rem 1.2rem; gap: 0.5rem; }
+    .progress-dot { width: 16px; }
+    .progress-dot.active { width: 28px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- Line field canvas -->
+  <canvas id="lineCanvas"></canvas>
+  <div class="grain"></div>
+
+  <!-- Enter Screen -->
+  <div class="enter-screen" id="enterScreen">
+    <div class="enter-eyebrow">Portfolio</div>
+    <div class="enter-brand">Lucky <em>Kumar</em></div>
+    <div class="enter-rule"></div>
+    <div class="enter-sub">Frontend · Backend<br>Adobe · Copywriting</div>
+    <button class="enter-btn" id="enterBtn"><span>Enter</span></button>
+  </div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <a href="#" class="brand" id="brand">Lucky <span>Kumar</span></a>
+    <span class="counter" id="counter">01 / 07</span>
+  </div>
+
+  <!-- TEXT LAYERS -->
+  <div class="text-layer" data-layer="0">
+    <div class="inner">
+      <p class="eyebrow">Frontend · Backend · Adobe · Copy</p>
+      <h1 class="display">Lucky<br>Kumar<em>.</em></h1>
+      <p class="body">
+        A developer and writer working where <strong>engineering precision</strong>
+        meets <strong>editorial craft</strong>. Four disciplines, one point of view.
+      </p>
+    </div>
+  </div>
+
+  <div class="text-layer align-right" data-layer="1">
+    <div class="inner">
+      <p class="eyebrow">01 — Frontend</p>
+      <h2 class="headline">The <em>surface</em><br>of things.</h2>
+      <p class="body">
+        Interfaces built with intent. Clean semantics, fluid motion, and
+        performance that stays out of the way. Every transition is a decision.
+      </p>
+      <div class="tags">
+        <span>HTML · CSS · JS</span>
+        <span>Motion</span>
+        <span>Accessibility</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-layer" data-layer="2">
+    <div class="inner">
+      <p class="eyebrow">02 — Backend</p>
+      <h2 class="headline">The <em>structure</em><br>underneath.</h2>
+      <p class="body">
+        APIs, data models, and architecture that scale quietly. The invisible
+        work that makes the visible work possible.
+      </p>
+      <div class="tags">
+        <span>APIs</span>
+        <span>Databases</span>
+        <span>Architecture</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-layer align-right" data-layer="3">
+    <div class="inner">
+      <p class="eyebrow">03 — Adobe Suite</p>
+      <h2 class="headline">The <em>form</em><br>of feeling.</h2>
+      <p class="body">
+        Design that respects the grid but knows when to break it. From brand
+        systems to pixel-perfect composition, every element earns its place.
+      </p>
+      <div class="tags">
+        <span>Photoshop</span>
+        <span>Illustrator</span>
+        <span>Brand Systems</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-layer" data-layer="4">
+    <div class="inner">
+      <p class="eyebrow">04 — Copywriting</p>
+      <h2 class="headline">The <em>voice</em><br>of the thing.</h2>
+      <p class="body">
+        Words that carry weight. Every headline, every line of microcopy —
+        written to be read, not skimmed. Clarity first, rhythm always.
+      </p>
+      <div class="tags">
+        <span>Headlines</span>
+        <span>Microcopy</span>
+        <span>Brand Voice</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-layer align-bottom" data-layer="5">
+    <div class="inner">
+      <p class="quote">
+        A jack of all trades is rarely a master of none — when the trades
+        <em>inform each other</em>, the work becomes something none of them
+        could produce alone.
+      </p>
+      <p class="attr">Lucky Kumar — on the value of range</p>
+    </div>
+  </div>
+
+  <div class="text-layer align-right" data-layer="6">
+    <div class="inner">
+      <p class="eyebrow">Get in touch</p>
+      <h2 class="headline">Let's build<br>something <em>considered.</em></h2>
+      <p class="body">
+        Open to thoughtful projects, collaborations, and conversations.
+        Reach out — I reply to everything.
+      </p>
+      <a href="mailto:hello@luckykumar.dev" class="btn"><span>Contact</span></a>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress" id="progress"></div>
+
+  <!-- Hint -->
+  <div class="hint" id="hint">
+    <div class="hint-line"></div>
+    <span>Scroll to compose</span>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ============================================================
+  // CUSTOM CURSOR
+  // ============================================================
+  const ring = document.getElementById('cursorRing');
+  const dot = document.getElementById('cursorDot');
+  let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+  let ringX = mouseX, ringY = mouseY;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+  });
+  function animateCursor() {
+    dot.style.left = mouseX + 'px';
+    dot.style.top = mouseY + 'px';
+    ringX += (mouseX - ringX) * 0.18;
+    ringY += (mouseY - ringY) * 0.18;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button, .progress-dot').forEach((el) => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  });
+  document.addEventListener('mousedown', () => document.body.classList.add('clicking'));
+  document.addEventListener('mouseup', () => document.body.classList.remove('clicking'));
+  document.addEventListener('mouseleave', () => { ring.style.opacity = '0'; dot.style.opacity = '0'; });
+  document.addEventListener('mouseenter', () => { ring.style.opacity = '1'; dot.style.opacity = '1'; });
+
+  // ============================================================
+  // THE LINE FIELD
+  //
+  // A grid of ~120 fine vertical lines. Each line's height, vertical
+  // position, and phase are driven by:
+  //   - the current scroll "position" (float, 0 .. 6)
+  //   - a slow ambient time
+  //   - a per-line sine wave with scene-dependent parameters
+  //
+  // Every scene changes the way the lines arrange themselves:
+  //   Scene 0 (hero):      lines fall into a gentle horizontal wave
+  //   Scene 1 (frontend):  lines cluster into a circular arc / dome
+  //   Scene 2 (backend):   lines form a strict grid-like ridge pattern
+  //   Scene 3 (adobe):     lines form a triangular envelope
+  //   Scene 4 (copy):      lines form a smooth continuous ring/valley
+  //   Scene 5 (quote):     lines settle into a low calm wash
+  //   Scene 6 (contact):   lines rise into a rising horizon
+  // ============================================================
+  const canvas = document.getElementById('lineCanvas');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    computeLineCount();
+  }
+  window.addEventListener('resize', resize);
+
+  const LINE_GAP = 9;
+  let LINE_COUNT = 0;
+  let lines = [];
+
+  function computeLineCount() {
+    LINE_COUNT = Math.ceil(W / LINE_GAP) + 2;
+    lines = [];
+    for (let i = 0; i < LINE_COUNT; i++) {
+      lines.push({
+        seed: Math.random() * Math.PI * 2,
+        speed: 0.4 + Math.random() * 0.5,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  // Scene configurations — what each shape looks like
+  // Each sceneFn(x) returns a baseline Y for a normalized x (0..1).
+  // (0 = top of viewport, 1 = bottom)
+  const SCENES = [
+    // 0 — HERO: gentle horizontal wave across the whole width
+    (x, p) => {
+      const wave = Math.sin(x * Math.PI * 2.2 + p * 0.6) * 0.06
+                 + Math.sin(x * Math.PI * 5.1 + p * 0.3) * 0.02;
+      return 0.52 + wave;
+    },
+    // 1 — FRONTEND: circular dome (arc across the top half)
+    (x, p) => {
+      const cx = 0.5, r = 0.32;
+      const dx = (x - cx) / r;
+      if (Math.abs(dx) > 1) return 0.78;
+      const y = Math.sqrt(1 - dx * dx);
+      return 0.5 - y * 0.28 + Math.sin(x * 30 + p) * 0.01;
+    },
+    // 2 — BACKEND: stepped grid ridges (strict, structured)
+    (x, p) => {
+      const step = Math.floor(x * 9) / 9;
+      const ridge = Math.sin(step * Math.PI * 2 + p * 0.3) * 0.18;
+      const jitter = Math.sin(x * 120 + p * 2) * 0.012;
+      return 0.55 - ridge + jitter;
+    },
+    // 3 — ADOBE: triangular envelope
+    (x, p) => {
+      const peak = Math.abs(x - 0.5);
+      const y = 0.5 - (1 - peak * 2) * 0.32;
+      return y + Math.sin(x * 40 + p * 1.2) * 0.012;
+    },
+    // 4 — COPY: smooth ring / valley (continuous curve)
+    (x, p) => {
+      const wave = Math.sin(x * Math.PI * 1.5 + p * 0.4) * 0.16;
+      const dip = Math.cos(x * Math.PI * 1.1 + p * 0.5) * 0.14;
+      return 0.5 + wave + dip;
+    },
+    // 5 — QUOTE: calm low wash
+    (x, p) => {
+      return 0.7 + Math.sin(x * Math.PI * 0.8 + p * 0.3) * 0.04;
+    },
+    // 6 — CONTACT: rising horizon
+    (x, p) => {
+      const rise = 0.68 - x * 0.28;
+      return rise + Math.sin(x * 12 + p * 0.6) * 0.014;
+    }
+  ];
+
+  // Blend two scenes for smooth transitions
+  function sceneY(x, p) {
+    const idx = Math.floor(p);
+    const frac = p - idx;
+    const a = SCENES[idx] || SCENES[SCENES.length - 1];
+    const b = SCENES[idx + 1] || SCENES[SCENES.length - 1];
+    // ease the blend
+    const ease = frac * frac * (3 - 2 * frac);
+    return a(x, p) * (1 - ease) + b(x, p) * ease;
+  }
+
+  let ambient = 0;
+
+  function drawLines(p) {
+    ambient += 0.005;
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = 0.5;
+    // The lines are drawn as vertical strokes from a baseline Y down to a bottom.
+    // Each line has its own micro-phase and sways subtly.
+
+    for (let i = 0; i < LINE_COUNT; i++) {
+      const line = lines[i];
+      const x = (i / (LINE_COUNT - 1));
+
+      // Baseline from the scene function
+      let baseY = sceneY(x, p);
+
+      // Per-line sway — gives organic micro-motion
+      const sway = Math.sin(ambient * line.speed + line.phase + x * 6) * 0.006;
+      baseY += sway;
+
+      // The line length / character changes with scene
+      // Hero + quote: long vertical lines
+      // Frontend: shorter, rising into the arc
+      // Backend: uniform short strokes (grid feel)
+      // Adobe: vary length by triangle slope
+      // Copy: longest in the middle
+      // Contact: shorter on the right
+      let len = 0.26;
+      const sceneIdx = Math.floor(p);
+
+      if (sceneIdx === 0) {
+        len = 0.24 + Math.sin(x * Math.PI * 2 + p * 2) * 0.06;
+      } else if (sceneIdx === 1) {
+        const dx = (x - cx) / 0.32;
+        len = Math.abs(dx) < 1 ? 0.18 + Math.sqrt(1 - dx * dx) * 0.14 : 0.1;
+      } else if (sceneIdx === 2) {
+        len = 0.10 + (Math.floor(x * 9) % 2 === 0 ? 0.06 : 0);
+      } else if (sceneIdx === 3) {
+        const peak = Math.abs(x - 0.5);
+        len = 0.28 - peak * 0.32;
+        if (len < 0.04) len = 0.04;
+      } else if (sceneIdx === 4) {
+        len = 0.16 + Math.sin(x * Math.PI * 2 + p * 2) * 0.08;
+      } else if (sceneIdx === 5) {
+        len = 0.20 + Math.cos(x * 8 + p) * 0.05;
+      } else {
+        len = 0.20 + (1 - x) * 0.1;
+      }
+
+      // Blend line length across scene transitions
+      const frac = p - Math.floor(p);
+      if (frac > 0.001 && sceneIdx + 1 < SCENES.length) {
+        const ease = frac * frac * (3 - 2 * frac);
+        const nxt = sceneIdx + 1;
+        let nextLen = len;
+        if (nxt === 1) {
+          const dx = (x - cx) / 0.32;
+          nextLen = Math.abs(dx) < 1 ? 0.18 + Math.sqrt(1 - dx * dx) * 0.14 : 0.1;
+        } else if (nxt === 2) {
+          nextLen = 0.10 + (Math.floor(x * 9) % 2 === 0 ? 0.06 : 0);
+        } else if (nxt === 3) {
+          const peak = Math.abs(x - 0.5);
+          nextLen = Math.max(0.04, 0.28 - peak * 0.32);
+        } else if (nxt === 4) {
+          nextLen = 0.16 + Math.sin(x * Math.PI * 2 + p * 2) * 0.08;
+        } else if (nxt === 5) {
+          nextLen = 0.20 + Math.cos(x * 8 + p) * 0.05;
+        } else {
+          nextLen = 0.20 + (1 - x) * 0.1;
+        }
+        len = len * (1 - ease) + nextLen * ease;
+      }
+
+      // Opacity: fade edges slightly so composition feels composed
+      const edgeFade = Math.min(1, Math.min(x, 1 - x) * 6);
+      const opacity = 0.22 + edgeFade * 0.35;
+
+      // Draw vertical line
+      const px = x * W;
+      const topY = baseY * H;
+      const bottomY = (baseY + len) * H;
+
+      // A tiny accent — every 8th line gets slightly darker / gold tint
+      const isAccent = i % 8 === 0;
+
+      ctx.beginPath();
+      ctx.moveTo(px, topY);
+      ctx.lineTo(px, bottomY);
+      ctx.strokeStyle = isAccent
+        ? `rgba(184, 137, 74, ${opacity * 0.9})`
+        : `rgba(28, 27, 24, ${opacity * 0.55})`;
+      ctx.lineWidth = isAccent ? 1.1 : 0.7;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // A subtle dot at the top of some lines — like a tick mark
+      if (i % 16 === 0) {
+        ctx.beginPath();
+        ctx.arc(px, topY, 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(184, 137, 74, ${opacity})`;
+        ctx.fill();
+      }
+    }
+
+    requestAnimationFrame(() => drawLines(position));
+  }
+
+  resize();
+  // Start drawing once we have a position
+  let position = 0;
+  drawLines(position);
+
+  // ============================================================
+  // SCROLL / NAVIGATION
+  // ============================================================
+  const textLayers = Array.from(document.querySelectorAll('.text-layer'));
+  const TOTAL = textLayers.length;
+  let current = 0;
+  let isAnimating = false;
+  let hasEntered = false;
+  let accumulated = 0;
+  let idleTimer = null;
+  const THRESHOLD = 90;
+
+  const counter = document.getElementById('counter');
+  const progressEl = document.getElementById('progress');
+  const hint = document.getElementById('hint');
+  const enterScreen = document.getElementById('enterScreen');
+  const enterBtn = document.getElementById('enterBtn');
+
+  // Build progress dots (elegant thin lines)
+  for (let i = 0; i < TOTAL; i++) {
+    const b = document.createElement('button');
+    b.className = 'progress-dot' + (i === 0 ? ' active' : '');
+    b.setAttribute('aria-label', 'Scene ' + (i + 1));
+    b.addEventListener('click', () => goTo(i));
+    b.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    b.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+    progressEl.appendChild(b);
+  }
+  const dots = progressEl.querySelectorAll('.progress-dot');
+
+  function updateMeta() {
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
+  }
+
+  // Update text layers based on continuous position
+  function updateText(p) {
+    textLayers.forEach((layer, i) => {
+      const dist = p - i;
+      const absDist = Math.abs(dist);
+      let opacity = Math.max(0, 1 - absDist * 1.4);
+      if (absDist > 0.85) opacity = 0;
+      const translateY = dist * 20;
+      const blur = Math.min(absDist * 3, 4);
+      layer.style.opacity = opacity;
+      layer.style.transform = `translateY(${translateY}px)`;
+      layer.style.filter = `blur(${blur}px)`;
+      layer.style.pointerEvents = absDist < 0.15 ? 'auto' : 'none';
+    });
+  }
+
+  // The main animation loop for text
+  let lastP = -1;
+  function tickText() {
+    if (Math.abs(position - lastP) > 0.0005) {
+      updateText(position);
+      lastP = position;
+    }
+    requestAnimationFrame(tickText);
+  }
+  tickText();
+
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+  function goTo(index) {
+    if (isAnimating || index === current) return;
+    if (index < 0 || index >= TOTAL) return;
+
+    isAnimating = true;
+    hint.classList.add('hide');
+
+    const startPos = position;
+    const endPos = index;
+    const startTime = performance.now();
+    const duration = Math.min(1100, 700 + Math.abs(endPos - startPos) * 120);
+
+    function step(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      position = startPos + (endPos - startPos) * e;
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        current = index;
+        position = index;
+        updateMeta();
+        isAnimating = false;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ============================================================
+  // WHEEL
+  // ============================================================
+  function handleWheel(e) {
+    if (!hasEntered) return;
+    e.preventDefault();
+    if (isAnimating) return;
+
+    let delta = e.deltaY;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) delta = e.deltaX;
+    accumulated += delta;
+
+    const previewFraction = Math.max(-1, Math.min(1, accumulated / THRESHOLD));
+    position = current + previewFraction * 0.6;
+
+    if (Math.abs(accumulated) >= THRESHOLD) {
+      const dir = accumulated > 0 ? 1 : -1;
+      const next = Math.max(0, Math.min(TOTAL - 1, current + dir));
+      if (next !== current) {
+        accumulated = 0;
+        goTo(next);
+      } else {
+        accumulated = 0;
+        animateBackToCurrent();
+      }
+    }
+
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (isAnimating) return;
+      accumulated = 0;
+      animateBackToCurrent();
+    }, 180);
+  }
+
+  function animateBackToCurrent() {
+    if (isAnimating) return;
+    if (Math.abs(position - current) < 0.005) {
+      position = current;
+      return;
+    }
+    isAnimating = true;
+    const startPos = position;
+    const endPos = current;
+    const startTime = performance.now();
+    const duration = 550;
+
+    function step(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      const e = 1 - Math.pow(1 - t, 3);
+      position = startPos + (endPos - startPos) * e;
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        position = current;
+        isAnimating = false;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ============================================================
+  // KEYBOARD
+  // ============================================================
+  function handleKey(e) {
+    if (!hasEntered) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterExperience(); }
+      return;
+    }
+    if (isAnimating) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault(); goTo(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault(); goTo(current - 1);
+    } else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(TOTAL - 1); }
+  }
+
+  // ============================================================
+  // TOUCH
+  // ============================================================
+  let touchStartX = 0, touchStartY = 0, touchMoved = false;
+
+  function handleTouchStart(e) {
+    if (!hasEntered) return;
+    const t = e.touches[0];
+    touchStartX = t.clientX; touchStartY = t.clientY;
+    touchMoved = false;
+  }
+  function handleTouchMove(e) {
+    if (!hasEntered || isAnimating) return;
+    const t = e.touches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) touchMoved = true;
+    const drag = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    position = current + Math.max(-1, Math.min(1, drag / 200)) * 0.6;
+    if (Math.abs(dx) > Math.abs(dy)) e.preventDefault();
+  }
+  function handleTouchEnd(e) {
+    if (!hasEntered || isAnimating) return;
+    if (!touchMoved) { animateBackToCurrent(); return; }
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+      dx < 0 ? goTo(current + 1) : goTo(current - 1);
+    } else if (Math.abs(dy) > 60) {
+      dy < 0 ? goTo(current + 1) : goTo(current - 1);
+    } else {
+      animateBackToCurrent();
+    }
+  }
+
+  // ============================================================
+  // ENTER
+  // ============================================================
+  function enterExperience() {
+    if (hasEntered) return;
+    hasEntered = true;
+    enterScreen.classList.add('gone');
+    setTimeout(() => {
+      position = 0;
+      updateMeta();
+    }, 100);
+  }
+  enterBtn.addEventListener('click', enterExperience);
+
+  // ============================================================
+  // BIND
+  // ============================================================
+  window.addEventListener('wheel', handleWheel, { passive: false });
+  window.addEventListener('keydown', handleKey);
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTouchEnd, { passive: true });
+  document.getElementById('brand').addEventListener('click', (e) => {
+    e.preventDefault();
+    goTo(0);
+  });
+
+  updateMeta();
+
+})();
+</script>
+</body>
+</html>

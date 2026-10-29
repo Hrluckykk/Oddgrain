@@ -1,0 +1,2490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SONA — Wireless Earbuds | Sound That Feels Like Yours</title>
+  <meta name="description" content="SONA makes premium wireless earbuds designed for everyday audio. Discover the SONA ONE, everyday wireless earbuds built around comfort, clarity, and simplicity." />
+  <meta name="theme-color" content="#111111" />
+  <link rel="canonical" href="https://www.sona.example/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="SONA — Wireless Earbuds" />
+  <meta property="og:description" content="Wireless sound designed to move with you. Meet SONA ONE." />
+  <meta property="og:url" content="https://www.sona.example/" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=1200&q=80" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       SONA — Design tokens
+       ============================================================ */
+    :root {
+      --obsidian: #111111;
+      --ivory: #F5F3EE;
+      --white: #FFFFFF;
+      --graphite: #777777;
+      --silver: #D9D9D6;
+      --olive: #A1A58B;
+      --signal: #C6FF3D;   /* techy accent, used sparingly */
+
+      --bg: var(--ivory);
+      --fg: var(--obsidian);
+      --muted: #5f5f5f;
+      --line: rgba(17,17,17,0.12);
+      --line-strong: rgba(17,17,17,0.28);
+
+      --font: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+      --fs-xs: 0.75rem;
+      --fs-sm: 0.875rem;
+      --fs-base: 1rem;
+      --fs-lg: 1.125rem;
+      --fs-xl: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+      --fs-2xl: clamp(2rem, 1.4rem + 3vw, 3.25rem);
+      --fs-3xl: clamp(2.75rem, 1.6rem + 6vw, 5.5rem);
+      --fs-hero: clamp(3rem, 1.4rem + 8vw, 7rem);
+
+      --space-1: 0.5rem;
+      --space-2: 0.75rem;
+      --space-3: 1rem;
+      --space-4: 1.5rem;
+      --space-5: 2rem;
+      --space-6: 3rem;
+      --space-7: 4rem;
+      --space-8: 6rem;
+      --space-9: 8rem;
+
+      --radius: 2px;
+      --radius-md: 6px;
+      --radius-pill: 999px;
+
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --t-fast: 160ms var(--ease);
+      --t-med: 320ms var(--ease);
+      --t-slow: 640ms var(--ease);
+
+      --maxw: 1360px;
+      --header-h: 72px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      scroll-padding-top: calc(var(--header-h) + 24px);
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: var(--fs-base);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+      cursor: none; /* custom cursor takes over */
+    }
+
+    /* Custom cursor only on precise-pointer devices */
+    @media (hover: none), (pointer: coarse) {
+      body { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none !important; }
+    }
+
+    img { max-width: 100%; display: block; }
+    h1, h2, h3 { margin: 0; line-height: 1.05; letter-spacing: -0.02em; font-weight: 700; }
+    p { margin: 0; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: none; }
+    @media (hover: none), (pointer: coarse) { button { cursor: pointer; } }
+
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border: 0;
+    }
+
+    :focus-visible { outline: 2px solid var(--obsidian); outline-offset: 3px; border-radius: 2px; }
+    [hidden] { display: none !important; } /* hard fix for drawer/menus */
+
+    /* ---------- Custom cursor ---------- */
+    .cursor-dot,
+    .cursor-ring {
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform;
+      mix-blend-mode: difference;
+    }
+    .cursor-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      transform: translate3d(-50%, -50%, 0);
+      transition: width var(--t-fast), height var(--t-fast), opacity var(--t-fast);
+    }
+    .cursor-ring {
+      width: 34px; height: 34px;
+      border: 1.5px solid rgba(255,255,255,0.9);
+      border-radius: 50%;
+      transform: translate3d(-50%, -50%, 0);
+      transition: width 220ms var(--ease), height 220ms var(--ease),
+                  border-color 220ms var(--ease), background-color 220ms var(--ease),
+                  opacity 220ms var(--ease);
+    }
+    body.cursor-hover .cursor-ring {
+      width: 56px; height: 56px;
+      border-color: rgba(198,255,61,0.95);
+      background: rgba(198,255,61,0.08);
+    }
+    body.cursor-hover .cursor-dot { width: 4px; height: 4px; }
+    body.cursor-down .cursor-ring { width: 24px; height: 24px; }
+    body.cursor-hidden .cursor-dot,
+    body.cursor-hidden .cursor-ring { opacity: 0; }
+
+    /* ---------- Noise overlay ---------- */
+    .noise {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.6rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-pill);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      transition: background var(--t-fast), color var(--t-fast),
+                  border-color var(--t-fast), transform var(--t-fast),
+                  box-shadow var(--t-med);
+      text-align: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.18), transparent 45%);
+      opacity: 0;
+      transition: opacity var(--t-med);
+      z-index: -1;
+    }
+    .btn:hover::after { opacity: 1; }
+    .btn:active { transform: translateY(1px) scale(0.99); }
+
+    .btn-dark { background: var(--obsidian); color: var(--white); }
+    .btn-dark:hover { background: #000; box-shadow: 0 8px 24px rgba(17,17,17,0.22); }
+
+    .btn-light { background: var(--white); color: var(--obsidian); }
+    .btn-light:hover { background: var(--ivory); box-shadow: 0 8px 24px rgba(17,17,17,0.18); }
+
+    .btn-ghost { background: transparent; color: var(--white); border-color: rgba(255,255,255,0.55); }
+    .btn-ghost:hover { border-color: var(--white); background: rgba(255,255,255,0.08); }
+
+    .btn.full { width: 100%; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .link-arrow {
+      position: relative;
+      font-weight: 600;
+      font-size: var(--fs-sm);
+      padding-bottom: 2px;
+      transition: opacity var(--t-fast);
+    }
+    .link-arrow::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 100%; height: 1px;
+      background: currentColor;
+      transform-origin: right;
+      transition: transform var(--t-med) var(--ease);
+    }
+    .link-arrow:hover::after { transform: scaleX(0); transform-origin: left; }
+
+    /* ---------- Announcement ticker ---------- */
+    .announcement-bar {
+      position: relative;
+      overflow: hidden;
+      background: var(--obsidian);
+      color: var(--ivory);
+      font-size: var(--fs-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .ticker {
+      display: flex;
+      gap: 3rem;
+      white-space: nowrap;
+      animation: ticker 38s linear infinite;
+      width: max-content;
+    }
+    .ticker span { display: inline-flex; align-items: center; gap: 0.6rem; }
+    .ticker span::before {
+      content: "";
+      width: 4px; height: 4px;
+      background: var(--signal);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--signal);
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ---------- Header ---------- */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(245, 243, 238, 0.82);
+      backdrop-filter: blur(14px) saturate(1.2);
+      -webkit-backdrop-filter: blur(14px) saturate(1.2);
+      border-bottom: 1px solid var(--line);
+      transition: background var(--t-med), border-color var(--t-med), backdrop-filter var(--t-med);
+    }
+    .site-header.is-scrolled {
+      background: rgba(245, 243, 238, 0.96);
+      border-bottom-color: var(--line-strong);
+    }
+    .header-inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      height: var(--header-h);
+      padding: 0 var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+    .wordmark {
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      position: relative;
+    }
+    .wordmark::after {
+      content: "™";
+      font-size: 0.5em;
+      vertical-align: super;
+      letter-spacing: 0;
+      margin-left: 2px;
+      color: var(--olive);
+    }
+    .primary-nav .nav-list {
+      display: flex;
+      gap: var(--space-5);
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    .primary-nav a {
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      position: relative;
+      padding: 0.3rem 0;
+    }
+    .primary-nav a::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 50%;
+      width: 0; height: 1px;
+      background: currentColor;
+      transform: translateY(-50%);
+      transition: width var(--t-med) var(--ease);
+    }
+    .primary-nav a:hover { padding-left: 18px; transition: padding var(--t-med) var(--ease); }
+    .primary-nav a:hover::before { width: 12px; }
+
+    .header-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      width: 42px; height: 42px;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--t-fast), transform var(--t-fast);
+      position: relative;
+    }
+    .icon-btn:hover { background: rgba(17,17,17,0.06); }
+    .icon-btn:active { transform: scale(0.95); }
+
+    .bag-btn { position: relative; }
+    .bag-count {
+      position: absolute;
+      top: 4px; right: 4px;
+      min-width: 17px; height: 17px;
+      padding: 0 4px;
+      background: var(--obsidian);
+      color: var(--white);
+      border-radius: var(--radius-pill);
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      font-family: var(--mono);
+      transition: transform var(--t-fast) var(--ease-spring);
+    }
+    .bag-count.bump { transform: scale(1.35); }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      width: 42px; height: 42px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .menu-toggle span {
+      display: block;
+      width: 20px; height: 1.5px;
+      background: var(--fg);
+      transition: transform var(--t-fast), opacity var(--t-fast);
+    }
+    .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ---------- Search ---------- */
+    .search-panel {
+      border-top: 1px solid var(--line);
+      padding: var(--space-4);
+      background: var(--ivory);
+    }
+    .search-form { max-width: var(--maxw); margin: 0 auto; display: flex; gap: var(--space-2); }
+    .search-form input {
+      flex: 1;
+      padding: 0.9rem 1.1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: var(--white);
+      font-family: inherit;
+      font-size: var(--fs-sm);
+      transition: border-color var(--t-fast), box-shadow var(--t-fast);
+    }
+    .search-form input:focus {
+      outline: none;
+      border-color: var(--obsidian);
+      box-shadow: 0 0 0 4px rgba(17,17,17,0.08);
+    }
+    .search-results {
+      max-width: var(--maxw);
+      margin: var(--space-3) auto 0;
+      display: grid;
+      gap: var(--space-2);
+    }
+    .search-result {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3);
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-sm);
+      transition: border-color var(--t-fast), transform var(--t-fast);
+    }
+    .search-result:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+    .search-empty { color: var(--muted); font-size: var(--fs-sm); padding: var(--space-3) 0; }
+
+    /* ---------- Mobile menu ---------- */
+    .mobile-menu {
+      position: fixed;
+      top: calc(var(--header-h) + 32px);
+      left: 0; right: 0;
+      background: var(--ivory);
+      border-bottom: 1px solid var(--line);
+      z-index: 99;
+      padding: var(--space-4);
+      animation: slideDown var(--t-fast) both;
+    }
+    .mobile-menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+    .mobile-menu a { font-size: var(--fs-lg); font-weight: 600; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - var(--header-h) - 40px);
+      display: flex;
+      align-items: flex-end;
+      color: var(--white);
+      overflow: hidden;
+    }
+    .hero-media { position: absolute; inset: 0; z-index: 0; }
+    .hero-media img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: brightness(0.55) saturate(0.9);
+      transform: scale(1.04);
+      animation: heroZoom 24s ease-in-out infinite alternate;
+    }
+    @keyframes heroZoom {
+      from { transform: scale(1.04) translate(0, 0); }
+      to   { transform: scale(1.12) translate(-1%, -1%); }
+    }
+    .hero-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(17,17,17,0.25) 0%, rgba(17,17,17,0.82) 100%),
+        radial-gradient(circle at 70% 40%, rgba(198,255,61,0.08), transparent 55%);
+    }
+
+    /* Animated grid backdrop (techy feel) */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0));
+      -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0));
+      animation: gridDrift 30s linear infinite;
+    }
+    @keyframes gridDrift {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 64px 64px, 64px 64px; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: var(--maxw);
+      width: 100%;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-4) var(--space-7);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: var(--fs-xs);
+      font-weight: 600;
+      color: var(--olive);
+      margin-bottom: var(--space-3);
+      font-family: var(--mono);
+    }
+    .hero .eyebrow { color: var(--silver); }
+
+    /* Live sound-wave bars in hero eyebrow */
+    .wave { display: inline-flex; align-items: center; gap: 2px; height: 12px; }
+    .wave i {
+      display: block;
+      width: 2px;
+      background: var(--signal);
+      border-radius: 1px;
+      animation: wavePulse 1.2s ease-in-out infinite;
+      box-shadow: 0 0 6px rgba(198,255,61,0.6);
+    }
+    .wave i:nth-child(1) { height: 5px; animation-delay: 0s; }
+    .wave i:nth-child(2) { height: 10px; animation-delay: 0.1s; }
+    .wave i:nth-child(3) { height: 7px; animation-delay: 0.2s; }
+    .wave i:nth-child(4) { height: 11px; animation-delay: 0.3s; }
+    .wave i:nth-child(5) { height: 6px; animation-delay: 0.4s; }
+    @keyframes wavePulse {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(1); }
+    }
+
+    .hero h1 {
+      font-size: var(--fs-hero);
+      font-weight: 800;
+      letter-spacing: -0.045em;
+      line-height: 0.94;
+      margin-bottom: var(--space-4);
+    }
+    .hero h1 .line { display: block; }
+    .hero h1 .line:nth-child(2) {
+      background: linear-gradient(90deg, #fff 0%, var(--signal) 130%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-sub {
+      font-size: var(--fs-lg);
+      max-width: 34ch;
+      margin-bottom: var(--space-5);
+      color: rgba(255,255,255,0.88);
+    }
+    .hero-ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+
+    .hero-meta {
+      display: flex;
+      gap: var(--space-5);
+      margin-top: var(--space-6);
+      font-family: var(--mono);
+      font-size: var(--fs-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+    }
+    .hero-meta span { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .hero-meta span::before {
+      content: "";
+      width: 4px; height: 4px;
+      background: var(--signal);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--signal);
+    }
+
+    /* ---------- Sections ---------- */
+    .section {
+      position: relative;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-4);
+      z-index: 2;
+    }
+    .section-title {
+      font-size: var(--fs-2xl);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-6);
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: var(--fs-xs);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: var(--space-3);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .section-label::before {
+      content: "";
+      width: 24px; height: 1px;
+      background: var(--line-strong);
+    }
+
+    .demo-note {
+      font-size: var(--fs-xs);
+      color: var(--muted);
+      margin-top: var(--space-4);
+      font-family: var(--mono);
+    }
+    .demo-note.center { text-align: center; }
+    .demo-note.small { font-size: 11px; margin-top: var(--space-2); }
+
+    /* ---------- Intro split ---------- */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-7);
+      align-items: center;
+    }
+    .split-text h2 { font-size: var(--fs-2xl); margin-bottom: var(--space-3); }
+    .split-text p { color: var(--muted); max-width: 42ch; }
+    .split-media { position: relative; }
+    .split-media img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      transition: transform var(--t-slow) var(--ease);
+    }
+    .split-media::before {
+      content: "";
+      position: absolute;
+      inset: -12px -12px auto auto;
+      width: 60px; height: 60px;
+      border-top: 1px solid var(--line-strong);
+      border-right: 1px solid var(--line-strong);
+      pointer-events: none;
+    }
+    .split-media:hover img { transform: scale(1.02); }
+
+    /* ---------- Featured ---------- */
+    .featured { padding-top: var(--space-7); }
+    .featured-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: var(--space-7);
+      align-items: center;
+    }
+    .featured-media {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      background: var(--white);
+    }
+    .featured-media img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      transition: transform var(--t-slow) var(--ease);
+    }
+    .featured-media:hover img { transform: scale(1.04); }
+
+    /* Floating techy badge */
+    .tech-badge {
+      position: absolute;
+      top: var(--space-3); left: var(--space-3);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.75rem;
+      background: rgba(17,17,17,0.85);
+      color: var(--ivory);
+      border-radius: var(--radius-pill);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      backdrop-filter: blur(6px);
+    }
+    .tech-badge::before {
+      content: "";
+      width: 6px; height: 6px;
+      background: var(--signal);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--signal);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .featured-info h2 { font-size: var(--fs-2xl); margin-bottom: var(--space-2); }
+    .featured-desc { color: var(--muted); margin-bottom: var(--space-4); }
+    .price {
+      font-size: var(--fs-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-4);
+      font-family: var(--mono);
+      letter-spacing: -0.01em;
+    }
+
+    .variant-group { border: none; padding: 0; margin: 0 0 var(--space-4); }
+    .variant-group legend {
+      font-family: var(--mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      margin-bottom: var(--space-2);
+      font-weight: 500;
+    }
+    .variant-options { display: flex; gap: var(--space-2); }
+    .variant-swatch {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      position: relative;
+      transition: transform var(--t-fast) var(--ease-spring), box-shadow var(--t-fast);
+    }
+    .variant-swatch[aria-checked="true"] {
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--obsidian);
+    }
+    .variant-swatch:hover { transform: scale(1.12); }
+
+    .featured-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    /* ---------- Benefits ---------- */
+    .benefits { border-top: 1px solid var(--line); }
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-5);
+    }
+    .benefit {
+      position: relative;
+      padding: var(--space-4) 0;
+      border-top: 1px solid var(--line);
+      transition: border-color var(--t-med);
+    }
+    .benefit:hover { border-top-color: var(--obsidian); }
+    .benefit-index {
+      font-family: var(--mono);
+      font-size: var(--fs-xs);
+      color: var(--olive);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+    .benefit h3 { font-size: var(--fs-lg); margin: var(--space-2) 0; }
+    .benefit p { color: var(--muted); font-size: var(--fs-sm); }
+
+    /* ---------- Story ---------- */
+    .story {
+      position: relative;
+      background: var(--obsidian);
+      color: var(--ivory);
+      max-width: none;
+      padding: var(--space-9) var(--space-4);
+      overflow: hidden;
+    }
+    .story::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(198,255,61,0.10), transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(198,255,61,0.06), transparent 45%);
+      pointer-events: none;
+    }
+    .story-inner { position: relative; max-width: var(--maxw); margin: 0 auto; }
+    .story-text h2 { font-size: var(--fs-3xl); margin-bottom: var(--space-4); }
+    .story-text p { color: rgba(245,243,238,0.75); max-width: 48ch; margin-bottom: var(--space-5); }
+    .story .link-arrow { color: var(--ivory); }
+    .story .eyebrow { color: var(--signal); }
+
+    /* ---------- Collection ---------- */
+    .collection-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+    .collection-filters { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+    .filter-chip {
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 0.5rem 1.1rem;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+    }
+    .filter-chip:hover { border-color: var(--line-strong); }
+    .filter-chip[aria-pressed="true"] {
+      background: var(--obsidian);
+      color: var(--white);
+      border-color: var(--obsidian);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    .product-card {
+      position: relative;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color var(--t-fast), transform var(--t-med) var(--ease);
+      isolation: isolate;
+    }
+    .product-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        600px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(198,255,61,0.10),
+        transparent 40%
+      );
+      opacity: 0;
+      transition: opacity var(--t-med);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .product-card:hover {
+      border-color: var(--line-strong);
+      transform: translateY(-3px);
+    }
+    .product-card:hover::before { opacity: 1; }
+
+    .product-card-media {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: var(--ivory);
+      position: relative;
+    }
+    .product-card-media img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform var(--t-slow) var(--ease);
+    }
+    .product-card:hover .product-card-media img { transform: scale(1.06); }
+
+    .product-card-body {
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      flex: 1;
+      position: relative;
+      z-index: 2;
+    }
+    .product-card-body h3 { font-size: var(--fs-lg); }
+    .product-card-desc { font-size: var(--fs-sm); color: var(--muted); }
+    .product-card-price {
+      font-weight: 700;
+      margin-top: var(--space-1);
+      font-family: var(--mono);
+    }
+    .product-card-colors {
+      display: flex;
+      gap: 6px;
+      margin: var(--space-1) 0;
+    }
+    .color-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+    }
+    .product-card-actions {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+    .product-card-actions .btn {
+      flex: 1;
+      padding: 0.65rem 0.8rem;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ---------- Statement ---------- */
+    .statement {
+      text-align: center;
+      padding: var(--space-9) var(--space-4);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+    .statement::before,
+    .statement::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 0;
+      width: 1px; height: 40px;
+      background: var(--line-strong);
+      transform: translateX(-50%);
+    }
+    .statement::after { top: auto; bottom: 0; }
+    .statement h2 {
+      font-size: var(--fs-3xl);
+      max-width: 22ch;
+      margin: 0 auto var(--space-4);
+    }
+    .statement h2 em {
+      font-style: normal;
+      background: linear-gradient(90deg, var(--obsidian), var(--olive));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .statement p { color: var(--muted); max-width: 52ch; margin: 0 auto; }
+
+    /* ---------- Lifestyle ---------- */
+    .lifestyle-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+    }
+    .lifestyle-item { margin: 0; position: relative; overflow: hidden; border-radius: var(--radius-md); }
+    .lifestyle-item img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      transition: transform var(--t-slow) var(--ease);
+    }
+    .lifestyle-item:hover img { transform: scale(1.06); }
+    .lifestyle-item figcaption {
+      position: absolute;
+      left: var(--space-3); bottom: var(--space-3);
+      color: var(--white);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    }
+    .lifestyle-item::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.55));
+      pointer-events: none;
+    }
+
+    /* ---------- Newsletter ---------- */
+    .newsletter {
+      background: var(--white);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      max-width: none;
+    }
+    .newsletter-inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    .newsletter h2 { font-size: var(--fs-2xl); margin-bottom: var(--space-2); }
+    .newsletter p { color: var(--muted); }
+
+    .newsletter-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-2);
+      align-items: start;
+    }
+    .newsletter-form input {
+      padding: 0.9rem 1.1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      font-family: inherit;
+      font-size: var(--fs-sm);
+      width: 100%;
+      transition: border-color var(--t-fast), box-shadow var(--t-fast);
+    }
+    .newsletter-form input:focus {
+      outline: none;
+      border-color: var(--obsidian);
+      box-shadow: 0 0 0 4px rgba(17,17,17,0.08);
+    }
+    .newsletter-form input[aria-invalid="true"] { border-color: #b3261e; }
+    .form-status { grid-column: 1 / -1; font-size: var(--fs-sm); min-height: 1.2em; font-family: var(--mono); }
+    .form-status.error { color: #b3261e; }
+    .form-status.success { color: #2e6b3a; }
+
+    /* ---------- FAQ ---------- */
+    .faq-list { border-top: 1px solid var(--line); }
+    .faq-item { border-bottom: 1px solid var(--line); }
+    .faq-question {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: var(--space-4) 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+      font-size: var(--fs-lg);
+      font-weight: 600;
+      gap: var(--space-3);
+      transition: padding var(--t-med) var(--ease);
+    }
+    .faq-question:hover { padding-left: 8px; }
+    .faq-icon {
+      width: 14px; height: 14px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .faq-icon::before,
+    .faq-icon::after {
+      content: "";
+      position: absolute;
+      background: var(--fg);
+      transition: transform var(--t-fast);
+    }
+    .faq-icon::before { top: 50%; left: 0; width: 100%; height: 1.5px; transform: translateY(-50%); }
+    .faq-icon::after { left: 50%; top: 0; height: 100%; width: 1.5px; transform: translateX(-50%); }
+    .faq-question[aria-expanded="true"] .faq-icon::after {
+      transform: translateX(-50%) rotate(90deg);
+      opacity: 0;
+    }
+    .faq-answer { padding: 0 0 var(--space-4); color: var(--muted); max-width: 68ch; }
+
+    /* ---------- Footer ---------- */
+    .site-footer {
+      position: relative;
+      background: var(--obsidian);
+      color: var(--ivory);
+      padding: var(--space-7) var(--space-4) var(--space-4);
+      overflow: hidden;
+    }
+    .site-footer::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+    .footer-inner {
+      position: relative;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.4fr repeat(4, 1fr);
+      gap: var(--space-5);
+    }
+    .footer-brand p {
+      color: rgba(245,243,238,0.7);
+      font-size: var(--fs-sm);
+      margin-top: var(--space-2);
+    }
+    .footer-brand .wordmark { color: var(--ivory); }
+    .footer-col h3 {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--silver);
+      margin-bottom: var(--space-3);
+    }
+    .footer-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+    .footer-col a { font-size: var(--fs-sm); color: rgba(245,243,238,0.8); transition: color var(--t-fast); }
+    .footer-col a:hover { color: var(--signal); }
+    .footer-bottom {
+      position: relative;
+      max-width: var(--maxw);
+      margin: var(--space-6) auto 0;
+      padding-top: var(--space-4);
+      border-top: 1px solid rgba(245,243,238,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(245,243,238,0.6);
+    }
+    .legal { list-style: none; display: flex; gap: var(--space-4); margin: 0; padding: 0; }
+    .legal a { color: inherit; }
+
+    /* ---------- Bag drawer ---------- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17,17,17,0.5);
+      z-index: 200;
+      animation: fadeIn var(--t-fast) both;
+      backdrop-filter: blur(2px);
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .bag-drawer {
+      position: fixed;
+      top: 0; right: 0;
+      height: 100dvh;
+      width: min(420px, 100vw);
+      background: var(--ivory);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--line);
+      animation: slideIn var(--t-med) both;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .bag-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--line);
+    }
+    .bag-head h2 { font-size: var(--fs-lg); }
+    .bag-head h2 span {
+      font-family: var(--mono);
+      font-size: var(--fs-xs);
+      color: var(--muted);
+      margin-left: 0.5rem;
+      font-weight: 500;
+    }
+    .bag-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-3) var(--space-4);
+    }
+    .bag-empty {
+      color: var(--muted);
+      font-size: var(--fs-sm);
+      padding: var(--space-6) 0;
+      text-align: center;
+      font-family: var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .bag-item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--line);
+      animation: fadeIn var(--t-med) both;
+    }
+    .bag-item img {
+      width: 64px; height: 64px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+    }
+    .bag-item-name { font-weight: 600; font-size: var(--fs-sm); }
+    .bag-item-variant {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .bag-item-qty {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-1);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 0.15rem 0.4rem;
+    }
+    .bag-item-qty button {
+      background: transparent;
+      border: none;
+      width: 24px; height: 24px;
+      font-size: 1rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background var(--t-fast);
+    }
+    .bag-item-qty button:hover { background: rgba(17,17,17,0.08); }
+    .bag-item-qty span {
+      min-width: 1.2em;
+      text-align: center;
+      font-size: var(--fs-sm);
+      font-family: var(--mono);
+    }
+    .bag-item-remove {
+      background: transparent;
+      border: none;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: underline;
+      padding: 0;
+      align-self: start;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .bag-item-price { font-weight: 700; font-size: var(--fs-sm); font-family: var(--mono); }
+    .bag-foot { padding: var(--space-4); border-top: 1px solid var(--line); }
+    .bag-subtotal {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      margin-bottom: var(--space-3);
+      font-family: var(--mono);
+    }
+
+    /* ---------- Toast ---------- */
+    .toast {
+      position: fixed;
+      bottom: var(--space-4);
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      background: var(--obsidian);
+      color: var(--white);
+      padding: 0.85rem 1.35rem;
+      border-radius: var(--radius-pill);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      z-index: 300;
+      transition: transform var(--t-med) var(--ease-spring);
+      pointer-events: none;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .toast::before {
+      content: "";
+      width: 6px; height: 6px;
+      background: var(--signal);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--signal);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ---------- Reveal ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 800ms var(--ease), transform 800ms var(--ease);
+    }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+
+
+    /* ---------- SONA immersive cursor soundscape ---------- */
+    .soundscape {
+      position: relative;
+      min-height: min(900px, 100svh);
+      overflow: hidden;
+      isolation: isolate;
+      background: #090a09;
+      color: #f5f3ee;
+      display: grid;
+      align-items: center;
+      padding: clamp(5rem, 9vw, 9rem) clamp(1.25rem, 5vw, 5rem);
+      --sound-x: 50%;
+      --sound-y: 45%;
+      --sound-energy: 0;
+    }
+    .soundscape::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse at var(--sound-x) var(--sound-y), rgba(198,255,61, calc(0.045 + var(--sound-energy) * 0.09)), transparent 33%),
+        linear-gradient(90deg, rgba(5,6,5,.92) 0%, rgba(5,6,5,.72) 36%, rgba(5,6,5,.12) 72%, rgba(5,6,5,.28) 100%),
+        url("https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=2000&q=90") center 42% / cover;
+      transform: scale(1.04) translate3d(calc((var(--sound-x) - 50%) * -.015), calc((var(--sound-y) - 50%) * -.012), 0);
+      transition: background-position 180ms linear;
+      will-change: transform;
+    }
+    .soundscape::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .24;
+      background-image: linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(90deg, black, transparent 80%);
+    }
+    .soundscape-inner { width: min(100%, 1360px); margin: 0 auto; position: relative; }
+    .soundscape-topline { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom: clamp(4rem, 12vh, 8rem); }
+    .soundscape-kicker { font-family: var(--mono); text-transform: uppercase; letter-spacing: .18em; font-size: 11px; color: rgba(245,243,238,.72); display:flex; align-items:center; gap:.65rem; }
+    .soundscape-kicker::before { content:""; width:22px; height:1px; background:var(--signal); }
+    .soundscape-live { display:flex; align-items:center; gap:.55rem; font-family:var(--mono); font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:rgba(245,243,238,.65); }
+    .soundscape-live-dot { width:6px; height:6px; border-radius:50%; background:#777; }
+    .soundscape.is-audio-on .soundscape-live-dot { background:var(--signal); box-shadow:0 0 12px rgba(198,255,61,.75); }
+    .soundscape-copy { max-width: 780px; position:relative; z-index:2; }
+    .soundscape h2 { font-size:clamp(3.4rem, 8.6vw, 8.5rem); line-height:.88; letter-spacing:-.075em; font-weight:800; max-width:9ch; margin:0 0 1.5rem; }
+    .soundscape h2 span { color:var(--signal); }
+    .soundscape-description { color:rgba(245,243,238,.76); font-size:clamp(1rem, 1.4vw, 1.2rem); max-width:32ch; margin-bottom:2rem; }
+    .soundscape-actions { display:flex; align-items:center; flex-wrap:wrap; gap:.8rem; }
+    .sound-toggle { border:1px solid rgba(245,243,238,.5); color:#f5f3ee; background:rgba(8,9,8,.35); border-radius:999px; padding:.9rem 1.25rem; display:inline-flex; align-items:center; gap:.7rem; font-size:.875rem; font-weight:600; backdrop-filter:blur(10px); transition:background .2s ease,border-color .2s ease,transform .2s ease; }
+    .sound-toggle:hover { background:rgba(245,243,238,.1); border-color:#f5f3ee; transform:translateY(-2px); }
+    .sound-toggle:focus-visible { outline:2px solid var(--signal); outline-offset:4px; }
+    .sound-toggle svg { width:17px; height:17px; }
+    .soundscape-hint { font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:rgba(245,243,238,.55); }
+    .soundscape-bottom { display:flex; align-items:flex-end; justify-content:space-between; gap:2rem; margin-top:clamp(4rem, 10vh, 7rem); }
+    .soundscape-note { max-width:22ch; font-size:12px; line-height:1.6; color:rgba(245,243,238,.58); }
+    .sound-visualizer { display:flex; align-items:center; justify-content:flex-end; gap:4px; height:44px; width:170px; opacity:.85; }
+    .sound-visualizer i { display:block; width:2px; height:8px; border-radius:3px; background:var(--signal); transform-origin:center; transition:height 100ms ease; }
+    .soundscape.is-audio-on .sound-visualizer i { animation: soundBars 700ms ease-in-out infinite alternate; }
+    .sound-visualizer i:nth-child(3n) { animation-delay:-250ms; }
+    .sound-visualizer i:nth-child(4n) { animation-delay:-430ms; }
+    @keyframes soundBars { from { transform:scaleY(.45); opacity:.55; } to { transform:scaleY(1.8); opacity:1; } }
+    .sound-cursor-glow { position:absolute; z-index:0; width:clamp(180px, 28vw, 420px); aspect-ratio:1; border-radius:50%; left:var(--sound-x); top:var(--sound-y); transform:translate(-50%,-50%); pointer-events:none; background:radial-gradient(circle,rgba(198,255,61,.1),rgba(198,255,61,.025) 38%,transparent 70%); mix-blend-mode:screen; }
+    .soundscape-portrait-label { position:absolute; right:clamp(1.25rem,5vw,5rem); bottom:clamp(7rem,12vh,10rem); writing-mode:vertical-rl; transform:rotate(180deg); font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:rgba(245,243,238,.58); }
+    .soundscape-portrait-label::after { content:""; display:inline-block; height:44px; width:1px; background:rgba(245,243,238,.45); margin-top:1rem; }
+    @media (max-width:700px) {
+      .soundscape { min-height:780px; align-items:end; padding-top:4rem; padding-bottom:3rem; }
+      .soundscape::before { background:linear-gradient(180deg,rgba(5,6,5,.1) 0%,rgba(5,6,5,.35) 30%,rgba(5,6,5,.94) 72%,#090a09 100%),url("https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=1000&q=85") 62% top / auto 68% no-repeat, #090a09; transform:none; }
+      .soundscape-topline { margin-bottom:18rem; align-items:flex-start; }
+      .soundscape h2 { font-size:clamp(3.5rem, 17vw, 6rem); }
+      .soundscape-bottom { margin-top:3rem; align-items:flex-start; flex-direction:column; gap:1rem; }
+      .soundscape-portrait-label { display:none; }
+      .soundscape-hint { width:100%; margin-top:.3rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .soundscape::before { transform:none !important; }
+      .soundscape.is-audio-on .sound-visualizer i { animation:none; }
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1024px) {
+      .featured-grid { grid-template-columns: 1fr; }
+      .split { grid-template-columns: 1fr; gap: var(--space-5); }
+      .lifestyle-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+      .newsletter-inner { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 860px) {
+      .primary-nav { display: none; }
+      .menu-toggle { display: inline-flex; }
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      .benefit-grid { grid-template-columns: 1fr; }
+      .hero-meta { display: none; }
+    }
+    @media (max-width: 600px) {
+      :root { --header-h: 64px; }
+      .section { padding: var(--space-6) var(--space-4); }
+      .hero-content { padding-bottom: var(--space-6); }
+      .hero-ctas { flex-direction: column; align-items: stretch; }
+      .hero-ctas .btn { width: 100%; }
+      .product-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr; gap: var(--space-4); }
+      .lifestyle-grid { grid-template-columns: 1fr; }
+      .newsletter-form { grid-template-columns: 1fr; }
+      .newsletter-form .btn { width: 100%; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+      .collection-head { flex-direction: column; align-items: flex-start; }
+      .search-form { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal { opacity: 1; transform: none; }
+      .hero-media img { animation: none; }
+      .hero-grid { animation: none; }
+      .ticker { animation: none; }
+      .wave i { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Custom cursor -->
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- Announcement ticker -->
+  <div class="announcement-bar" role="region" aria-label="Announcement">
+    <div class="ticker" aria-hidden="true">
+      <span>Meet SONA</span>
+      <span>Your world, in better sound</span>
+      <span>SONA ONE — ₹3,499</span>
+      <span>Wireless sound, designed to move</span>
+      <span>Find your frequency</span>
+      <span>Meet SONA</span>
+      <span>Your world, in better sound</span>
+      <span>SONA ONE — ₹3,499</span>
+      <span>Wireless sound, designed to move</span>
+      <span>Find your frequency</span>
+    </div>
+    <span class="visually-hidden">Meet SONA. Your world, in better sound.</span>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+      <a href="#top" class="wordmark" aria-label="SONA home">SONA</a>
+      <nav class="primary-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="#collection">Shop</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#story">Our Sound</a></li>
+          <li><a href="#about">About SONA</a></li>
+          <li><a href="#faq">Support</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" type="button" id="searchToggle" aria-label="Open search" aria-expanded="false" aria-controls="searchPanel">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn bag-btn" type="button" id="bagToggle" aria-label="Open shopping bag" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M6 8h12l-1 12H7L6 8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span class="bag-count" id="bagCount" aria-hidden="true">0</span>
+          <span class="visually-hidden" id="bagCountText">0 items in bag</span>
+        </button>
+        <button class="menu-toggle" type="button" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="search-panel" id="searchPanel" hidden>
+      <form class="search-form" id="searchForm" role="search">
+        <label class="visually-hidden" for="searchInput">Search products</label>
+        <input type="search" id="searchInput" name="q" placeholder="Search SONA products" autocomplete="off" />
+        <button type="submit" class="btn btn-dark">Search</button>
+      </form>
+      <div class="search-results" id="searchResults" aria-live="polite"></div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" hidden>
+    <nav aria-label="Mobile">
+      <ul>
+        <li><a href="#collection">Shop</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#story">Our Sound</a></li>
+        <li><a href="#about">About SONA</a></li>
+        <li><a href="#faq">Support</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-media" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=1600&q=80" alt="" width="1600" height="1067" fetchpriority="high" />
+      </div>
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow">
+          <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          SONA ONE · Wireless
+        </p>
+        <h1 id="heroTitle">
+          <span class="line">Less noise.</span>
+          <span class="line">More you.</span>
+        </h1>
+        <p class="hero-sub">Wireless sound designed to move with you.</p>
+        <div class="hero-ctas">
+          <a href="#collection" class="btn btn-light" data-magnetic>Explore SONA</a>
+          <a href="#story" class="btn btn-ghost" data-magnetic>Discover our sound</a>
+        </div>
+        <div class="hero-meta" aria-hidden="true">
+          <span>Everyday audio</span>
+          <span>Designed in India</span>
+          <span>Find your frequency</span>
+        </div>
+      </div>
+    </section>
+
+
+
+    <section class="soundscape" id="experience" aria-labelledby="soundscapeTitle">
+      <div class="sound-cursor-glow" aria-hidden="true"></div>
+      <div class="soundscape-inner">
+        <div class="soundscape-topline">
+          <p class="soundscape-kicker">The SONA experience / 001</p>
+          <p class="soundscape-live"><span class="soundscape-live-dot" aria-hidden="true"></span><span id="soundStatus">Sound off</span></p>
+        </div>
+        <div class="soundscape-copy">
+          <h2 id="soundscapeTitle">PUT THE WORLD<br>ON <span>YOUR</span> TERMS.</h2>
+          <p class="soundscape-description">Move through the moment. Let the sound follow.</p>
+          <div class="soundscape-actions">
+            <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" aria-describedby="soundHint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+              <span id="soundToggleText">Enable sound</span>
+            </button>
+            <label class="visually-hidden" for="soundVolume">Sound volume</label>
+            <input id="soundVolume" type="range" min="0" max="0.35" step="0.01" value="0.12" aria-label="Sound volume" style="width:100px; accent-color:#c6ff3d" />
+            <span class="soundscape-hint" id="soundHint">Move your cursor to explore the space</span>
+          </div>
+        </div>
+        <div class="soundscape-bottom">
+          <p class="soundscape-note">An original, generative soundscape. Best experienced with headphones. Sound begins only when you choose.</p>
+          <div class="sound-visualizer" id="soundVisualizer" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+      </div>
+      <div class="soundscape-portrait-label" aria-hidden="true">A different kind of listening</div>
+    </section>
+
+    <section class="section intro" id="about" aria-labelledby="introTitle">
+      <div class="split">
+        <div class="split-text reveal">
+          <p class="section-label">01 — Philosophy</p>
+          <h2 id="introTitle">Your sound. Your space.</h2>
+          <p>From the first track of the morning to the quiet moments in between, SONA is made for the way you listen.</p>
+        </div>
+        <div class="split-media reveal">
+          <img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=1200&q=80" alt="Person wearing wireless earbuds while walking outdoors" width="1200" height="800" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section class="section featured" aria-labelledby="featuredTitle">
+      <div class="featured-grid">
+        <div class="featured-media reveal">
+          <img id="featuredImage" src="https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=1000&q=80" alt="SONA ONE wireless earbuds with charging case" width="1000" height="1000" loading="lazy" />
+          <span class="tech-badge">New</span>
+        </div>
+        <div class="featured-info reveal">
+          <p class="section-label">02 — Flagship</p>
+          <h2 id="featuredTitle">SONA ONE</h2>
+          <p class="featured-desc">Everyday wireless earbuds, designed around comfort, clarity, and simplicity.</p>
+          <p class="price" id="featuredPrice">₹3,499</p>
+          <fieldset class="variant-group">
+            <legend>Color</legend>
+            <div class="variant-options" id="featuredColors" role="radiogroup" aria-label="Choose color"></div>
+          </fieldset>
+          <div class="featured-actions">
+            <button class="btn btn-dark" id="featuredAdd" type="button" data-magnetic>Add to Bag</button>
+            <a href="#collection" class="link-arrow">Product details →</a>
+          </div>
+          <p class="demo-note">Sample pricing. Specifications are editable demo content.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section benefits" aria-labelledby="benefitsTitle">
+      <p class="section-label reveal">03 — Built around the everyday</p>
+      <h2 id="benefitsTitle" class="section-title reveal">Made for the rhythm of your day.</h2>
+      <div class="benefit-grid">
+        <article class="benefit reveal">
+          <span class="benefit-index">01</span>
+          <h3>Made for Everyday</h3>
+          <p>Comfortable design for the rhythm of your day.</p>
+        </article>
+        <article class="benefit reveal">
+          <span class="benefit-index">02</span>
+          <h3>Sound That Stays With You</h3>
+          <p>Your music, podcasts, and calls in one simple experience.</p>
+        </article>
+        <article class="benefit reveal">
+          <span class="benefit-index">03</span>
+          <h3>Details That Matter</h3>
+          <p>Thoughtful design, intuitive controls, and a compact form.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section story" id="story" aria-labelledby="storyTitle">
+      <div class="story-inner">
+        <div class="story-text reveal">
+          <p class="eyebrow">
+            <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            Design Philosophy
+          </p>
+          <h2 id="storyTitle">Good sound.<br />No fuss.</h2>
+          <p>SONA ONE is designed to disappear into your day — a calm, considered form that lets the sound take the lead. Nothing extra. Nothing missing.</p>
+          <a href="#collection" class="link-arrow">Get to know SONA ONE →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section collection" id="collection" aria-labelledby="collectionTitle">
+      <div class="collection-head">
+        <div>
+          <p class="section-label reveal">04 — The collection</p>
+          <h2 id="collectionTitle" class="section-title reveal">Sound, considered.</h2>
+        </div>
+        <div class="collection-filters" id="collectionFilters" role="group" aria-label="Filter by category"></div>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+      <p class="demo-note center">Catalogue entries are illustrative demo data. Edit the <code>SONA_PRODUCTS</code> array in the script.</p>
+    </section>
+
+    <section class="section statement" aria-labelledby="statementTitle">
+      <h2 id="statementTitle" class="reveal">Made for the moments that <em>sound like you.</em></h2>
+      <p class="reveal">Some moments need a soundtrack. Others need a little space. SONA is designed to fit naturally into both.</p>
+    </section>
+
+    <section class="section lifestyle" aria-labelledby="lifestyleTitle">
+      <p class="section-label reveal">05 — In your day</p>
+      <h2 id="lifestyleTitle" class="section-title reveal">Everywhere you listen.</h2>
+      <div class="lifestyle-grid">
+        <figure class="lifestyle-item reveal">
+          <img src="https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=800&q=80" alt="Wireless earbuds during a morning routine" width="800" height="600" loading="lazy" />
+          <figcaption>Morning</figcaption>
+        </figure>
+        <figure class="lifestyle-item reveal">
+          <img src="https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=800&q=80" alt="Listening to music on a commute" width="800" height="600" loading="lazy" />
+          <figcaption>Commute</figcaption>
+        </figure>
+        <figure class="lifestyle-item reveal">
+          <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=800&q=80" alt="Focused listening during work" width="800" height="600" loading="lazy" />
+          <figcaption>Focus</figcaption>
+        </figure>
+        <figure class="lifestyle-item reveal">
+          <img src="https://images.unsplash.com/photo-1520170350707-b2da59970118?auto=format&fit=crop&w=800&q=80" alt="Everyday listening in the city" width="800" height="600" loading="lazy" />
+          <figcaption>Everyday</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section newsletter" aria-labelledby="newsletterTitle">
+      <div class="newsletter-inner">
+        <div class="reveal">
+          <p class="section-label">06 — Newsletter</p>
+          <h2 id="newsletterTitle">Stay in tune.</h2>
+          <p>New releases, product stories, and things worth listening to.</p>
+        </div>
+        <form class="newsletter-form reveal" id="newsletterForm" novalidate>
+          <label class="visually-hidden" for="newsletterEmail">Email address</label>
+          <input type="email" id="newsletterEmail" name="email" placeholder="Email address" required aria-describedby="newsletterStatus" />
+          <button type="submit" class="btn btn-dark" data-magnetic>Subscribe</button>
+          <p class="form-status" id="newsletterStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="section faq" id="faq" aria-labelledby="faqTitle">
+      <p class="section-label reveal">07 — Support</p>
+      <h2 id="faqTitle" class="section-title reveal">Questions, answered.</h2>
+      <div class="faq-list" id="faqList">
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq1" id="faqBtn1">
+            <span>What is SONA?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-answer" id="faq1" role="region" aria-labelledby="faqBtn1" hidden>
+            <p>SONA is a modern audio brand focused on design-conscious, everyday wireless earbuds. Our flagship, SONA ONE, is built around comfort, clarity, and simplicity.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2" id="faqBtn2">
+            <span>How do I choose the right earbuds?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-answer" id="faq2" role="region" aria-labelledby="faqBtn2" hidden>
+            <p>Consider how you listen most — commuting, focusing, or calls — and choose the model that fits your routine. SONA ONE is our all-rounder for everyday use.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq3" id="faqBtn3">
+            <span>What colors are available?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-answer" id="faq3" role="region" aria-labelledby="faqBtn3" hidden>
+            <p>SONA ONE is offered in Obsidian, Ivory, and Olive. Availability may vary by region.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq4" id="faqBtn4">
+            <span>How do I care for my earbuds?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-answer" id="faq4" role="region" aria-labelledby="faqBtn4" hidden>
+            <p>Keep the earbuds and case clean and dry, store them in the case when not in use, and avoid prolonged exposure to moisture or extreme heat. Detailed care guidance will be included with your product.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq5" id="faqBtn5">
+            <span>How can I contact support?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-answer" id="faq5" role="region" aria-labelledby="faqBtn5" hidden>
+            <p>Support contact details will be added before launch. This is a frontend demonstration site.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#top" class="wordmark">SONA</a>
+        <p>Sound that feels like yours.</p>
+      </div>
+      <nav class="footer-col" aria-label="Shop">
+        <h3>Shop</h3>
+        <ul>
+          <li><a href="#collection">All products</a></li>
+          <li><a href="#collection">SONA ONE</a></li>
+          <li><a href="#collection">SONA ONE+</a></li>
+          <li><a href="#collection">SONA CASE</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="About">
+        <h3>About</h3>
+        <ul>
+          <li><a href="#about">About SONA</a></li>
+          <li><a href="#story">Our Sound</a></li>
+          <li><a href="#" aria-disabled="true">Careers (placeholder)</a></li>
+          <li><a href="#" aria-disabled="true">Press (placeholder)</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="Support">
+        <h3>Support</h3>
+        <ul>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#" aria-disabled="true">Shipping (placeholder)</a></li>
+          <li><a href="#" aria-disabled="true">Returns (placeholder)</a></li>
+          <li><a href="#" aria-disabled="true">Contact (placeholder)</a></li>
+        </ul>
+      </nav>
+      <div class="footer-col">
+        <h3>Follow</h3>
+        <ul class="social-list">
+          <li><a href="#" aria-disabled="true">Instagram</a></li>
+          <li><a href="#" aria-disabled="true">YouTube</a></li>
+          <li><a href="#" aria-disabled="true">X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© <span id="year"></span> SONA. Frontend demonstration only.</p>
+      <ul class="legal">
+        <li><a href="#" aria-disabled="true">Privacy Policy (placeholder)</a></li>
+        <li><a href="#" aria-disabled="true">Terms &amp; Conditions (placeholder)</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Bag drawer — MUST start hidden; [hidden] fix above enforces it -->
+  <div class="overlay" id="bagOverlay" hidden></div>
+  <aside class="bag-drawer" id="bagDrawer" role="dialog" aria-modal="true" aria-labelledby="bagTitle" hidden>
+    <div class="bag-head">
+      <h2 id="bagTitle">Your Bag <span id="bagHeadCount">0</span></h2>
+      <button class="icon-btn" type="button" id="bagClose" aria-label="Close bag">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="1.6"/><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="1.6"/></svg>
+      </button>
+    </div>
+    <div class="bag-body" id="bagBody"></div>
+    <div class="bag-foot">
+      <div class="bag-subtotal">
+        <span>Subtotal</span>
+        <span id="bagSubtotal">₹0</span>
+      </div>
+      <button class="btn btn-dark full" id="checkoutBtn" type="button" disabled data-magnetic>Checkout (demo)</button>
+      <p class="demo-note small">Frontend demonstration. No order is placed and no payment is processed.</p>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  /* ============================================================
+     SONA — Product data (editable demo content)
+     ============================================================ */
+  const SONA_PRODUCTS = [
+    {
+      id: "sona-one",
+      name: "SONA ONE",
+      description: "Everyday wireless earbuds, designed around comfort, clarity, and simplicity.",
+      shortDescription: "Everyday wireless earbuds.",
+      pricePaise: 349900,
+      category: "earbuds",
+      image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=800&q=80",
+      colors: [
+        { id: "obsidian", name: "Obsidian", hex: "#111111" },
+        { id: "ivory", name: "Ivory", hex: "#F5F3EE" },
+        { id: "olive", name: "Olive", hex: "#A1A58B" }
+      ],
+      availability: "in-stock",
+      specs: {
+        "Battery life": "Editable sample — confirm before launch",
+        "Driver": "Editable sample — confirm before launch",
+        "Connectivity": "Editable sample — confirm before launch"
+      }
+    },
+    {
+      id: "sona-one-plus",
+      name: "SONA ONE+",
+      description: "A higher-tier model concept for listeners who want more.",
+      shortDescription: "Higher-tier model concept.",
+      pricePaise: 499900,
+      category: "earbuds",
+      image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80",
+      colors: [
+        { id: "obsidian", name: "Obsidian", hex: "#111111" },
+        { id: "ivory", name: "Ivory", hex: "#F5F3EE" }
+      ],
+      availability: "in-stock",
+      specs: {
+        "Battery life": "Editable sample — confirm before launch",
+        "Driver": "Editable sample — confirm before launch"
+      }
+    },
+    {
+      id: "sona-case",
+      name: "SONA CASE",
+      description: "Charging case or accessory concept for your SONA earbuds.",
+      shortDescription: "Charging case accessory concept.",
+      pricePaise: 99900,
+      category: "accessories",
+      image: "https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?auto=format&fit=crop&w=800&q=80",
+      colors: [
+        { id: "ivory", name: "Ivory", hex: "#F5F3EE" }
+      ],
+      availability: "in-stock",
+      specs: {}
+    }
+  ];
+
+  function formatINR(paise) {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0
+    }).format(paise / 100);
+  }
+
+  /* ============================================================
+     SONA — Custom cursor
+     ============================================================ */
+  (function initCursor() {
+    if (window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
+    const dot = document.querySelector(".cursor-dot");
+    const ring = document.querySelector(".cursor-ring");
+    if (!dot || !ring) return;
+
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let rx = mx, ry = my;
+
+    window.addEventListener("mousemove", (e) => {
+      mx = e.clientX; my = e.clientY;
+      document.body.classList.remove("cursor-hidden");
+    });
+    window.addEventListener("mousedown", () => document.body.classList.add("cursor-down"));
+    window.addEventListener("mouseup", () => document.body.classList.remove("cursor-down"));
+    document.addEventListener("mouseleave", () => document.body.classList.add("cursor-hidden"));
+    document.addEventListener("mouseenter", () => document.body.classList.remove("cursor-hidden"));
+
+    function raf() {
+      rx += (mx - rx) * 0.18;
+      ry += (my - ry) * 0.18;
+      dot.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    const interactive = "a, button, [role='button'], input, textarea, select, .product-card, .variant-swatch, .filter-chip";
+    document.addEventListener("mouseover", (e) => {
+      if (e.target.closest(interactive)) document.body.classList.add("cursor-hover");
+    });
+    document.addEventListener("mouseout", (e) => {
+      if (e.target.closest(interactive)) document.body.classList.remove("cursor-hover");
+    });
+  })();
+
+  /* ============================================================
+     SONA — Magnetic buttons + card spotlight
+     ============================================================ */
+  (function initMagnetsAndSpotlight() {
+    const magnets = document.querySelectorAll("[data-magnetic]");
+    magnets.forEach((el) => {
+      el.addEventListener("mousemove", (e) => {
+        const r = el.getBoundingClientRect();
+        const mx = ((e.clientX - r.left) / r.width) * 100;
+        const my = ((e.clientY - r.top) / r.height) * 100;
+        el.style.setProperty("--mx", mx + "%");
+        el.style.setProperty("--my", my + "%");
+      });
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      const card = e.target.closest(".product-card");
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top) + "px");
+    });
+  })();
+
+  /* ============================================================
+     SONA — Main interactions
+     ============================================================ */
+  (function () {
+    "use strict";
+
+    const products = SONA_PRODUCTS;
+    const CART_KEY = "sona_cart_v1";
+
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+    function getProduct(id) {
+      return products.find((p) => p.id === id) || null;
+    }
+
+    /* ---------- Cart state ---------- */
+    function loadCart() {
+      try {
+        const raw = localStorage.getItem(CART_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(
+          (item) =>
+            item &&
+            typeof item.id === "string" &&
+            typeof item.color === "string" &&
+            Number.isInteger(item.qty) &&
+            item.qty > 0 &&
+            getProduct(item.id)
+        );
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCart(cart) {
+      try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch {}
+    }
+
+    let cart = loadCart();
+
+    function cartCount() { return cart.reduce((s, i) => s + i.qty, 0); }
+    function cartSubtotal() {
+      return cart.reduce((s, i) => {
+        const p = getProduct(i.id);
+        return s + (p ? p.pricePaise * i.qty : 0);
+      }, 0);
+    }
+
+    function addToCart(productId, colorId, qty = 1) {
+      const product = getProduct(productId);
+      if (!product) return;
+      const color = product.colors.find((c) => c.id === colorId) || product.colors[0];
+      const existing = cart.find((i) => i.id === productId && i.color === color.id);
+      if (existing) existing.qty += qty;
+      else cart.push({ id: productId, color: color.id, qty });
+      saveCart(cart);
+      renderCart();
+      showToast(product.name + " added to bag");
+      bumpBagCount();
+    }
+
+    function updateQty(productId, colorId, delta) {
+      const item = cart.find((i) => i.id === productId && i.color === colorId);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter((i) => !(i.id === productId && i.color === colorId));
+      saveCart(cart);
+      renderCart();
+    }
+
+    function removeItem(productId, colorId) {
+      cart = cart.filter((i) => !(i.id === productId && i.color === colorId));
+      saveCart(cart);
+      renderCart();
+    }
+
+    /* ---------- Toast ---------- */
+    let toastTimer = null;
+    function showToast(message) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    /* ---------- Bag ---------- */
+    const bagCountEl = $("#bagCount");
+    const bagCountTextEl = $("#bagCountText");
+    const bagHeadCountEl = $("#bagHeadCount");
+
+    function bumpBagCount() {
+      bagCountEl.classList.add("bump");
+      setTimeout(() => bagCountEl.classList.remove("bump"), 320);
+    }
+
+    function updateBagCount() {
+      const count = cartCount();
+      bagCountEl.textContent = String(count);
+      bagCountTextEl.textContent = count + " item" + (count === 1 ? "" : "s") + " in bag";
+      if (bagHeadCountEl) bagHeadCountEl.textContent = "(" + count + ")";
+    }
+
+    function renderCart() {
+      updateBagCount();
+      const body = $("#bagBody");
+      const subtotalEl = $("#bagSubtotal");
+      const checkoutBtn = $("#checkoutBtn");
+
+      if (cart.length === 0) {
+        body.innerHTML = '<p class="bag-empty">Your bag is empty</p>';
+        subtotalEl.textContent = formatINR(0);
+        checkoutBtn.disabled = true;
+        return;
+      }
+
+      body.innerHTML = "";
+      cart.forEach((item) => {
+        const product = getProduct(item.id);
+        if (!product) return;
+        const color = product.colors.find((c) => c.id === item.color) || product.colors[0];
+        const el = document.createElement("div");
+        el.className = "bag-item";
+        el.innerHTML =
+          '<img src="' + product.image + '" alt="' + product.name + '" width="64" height="64" loading="lazy" />' +
+          '<div>' +
+            '<p class="bag-item-name">' + product.name + '</p>' +
+            '<p class="bag-item-variant">' + color.name + '</p>' +
+            '<div class="bag-item-qty">' +
+              '<button type="button" data-action="dec" aria-label="Decrease quantity of ' + product.name + '">−</button>' +
+              '<span>' + item.qty + '</span>' +
+              '<button type="button" data-action="inc" aria-label="Increase quantity of ' + product.name + '">+</button>' +
+            '</div>' +
+          '</div>' +
+          '<div style="text-align:right;">' +
+            '<p class="bag-item-price">' + formatINR(product.pricePaise * item.qty) + '</p>' +
+            '<button type="button" class="bag-item-remove" data-action="remove">Remove</button>' +
+          '</div>';
+        el.querySelector('[data-action="inc"]').addEventListener("click", () => updateQty(item.id, item.color, 1));
+        el.querySelector('[data-action="dec"]').addEventListener("click", () => updateQty(item.id, item.color, -1));
+        el.querySelector('[data-action="remove"]').addEventListener("click", () => removeItem(item.id, item.color));
+        body.appendChild(el);
+      });
+
+      subtotalEl.textContent = formatINR(cartSubtotal());
+      checkoutBtn.disabled = false;
+    }
+
+    /* ---------- Bag drawer ---------- */
+    const bagDrawer = $("#bagDrawer");
+    const bagOverlay = $("#bagOverlay");
+    const bagToggle = $("#bagToggle");
+    const bagClose = $("#bagClose");
+    let lastFocused = null;
+
+    function openBag() {
+      lastFocused = document.activeElement;
+      bagOverlay.hidden = false;
+      bagDrawer.hidden = false;
+      bagClose.focus();
+      document.body.style.overflow = "hidden";
+    }
+    function closeBag() {
+      bagOverlay.hidden = true;
+      bagDrawer.hidden = true;
+      document.body.style.overflow = "";
+      if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+    }
+    bagToggle.addEventListener("click", openBag);
+    bagClose.addEventListener("click", closeBag);
+    bagOverlay.addEventListener("click", closeBag);
+    $("#checkoutBtn").addEventListener("click", () => showToast("Demo only — no order placed."));
+
+    /* ---------- Featured product ---------- */
+    const featuredProduct = products.find((p) => p.id === "sona-one");
+    const featuredColors = $("#featuredColors");
+    $("#featuredPrice").textContent = formatINR(featuredProduct.pricePaise);
+    let selectedFeaturedColor = featuredProduct.colors[0].id;
+
+    featuredProduct.colors.forEach((color, index) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "variant-swatch";
+      btn.style.background = color.hex;
+      btn.setAttribute("role", "radio");
+      btn.setAttribute("aria-label", color.name);
+      btn.setAttribute("aria-checked", index === 0 ? "true" : "false");
+      btn.dataset.color = color.id;
+      btn.addEventListener("click", () => {
+        selectedFeaturedColor = color.id;
+        $$(".variant-swatch", featuredColors).forEach((b) =>
+          b.setAttribute("aria-checked", b.dataset.color === color.id ? "true" : "false")
+        );
+      });
+      featuredColors.appendChild(btn);
+    });
+
+    $("#featuredAdd").addEventListener("click", () => {
+      addToCart(featuredProduct.id, selectedFeaturedColor, 1);
+      openBag();
+    });
+
+    /* ---------- Collection ---------- */
+    const grid = $("#productGrid");
+    const filtersEl = $("#collectionFilters");
+    let activeFilter = "all";
+
+    const categories = ["all"].concat(Array.from(new Set(products.map((p) => p.category))));
+    categories.forEach((cat) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "filter-chip";
+      btn.textContent = cat === "all" ? "All" : cat.charAt(0).toUpperCase() + cat.slice(1);
+      btn.setAttribute("aria-pressed", cat === activeFilter ? "true" : "false");
+      btn.addEventListener("click", () => {
+        activeFilter = cat;
+        $$(".filter-chip", filtersEl).forEach((b) => b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+        renderCollection();
+      });
+      filtersEl.appendChild(btn);
+    });
+
+    function renderCollection() {
+      grid.innerHTML = "";
+      const visible = activeFilter === "all" ? products : products.filter((p) => p.category === activeFilter);
+      if (visible.length === 0) {
+        grid.innerHTML = '<p class="bag-empty">No products in this category.</p>';
+        return;
+      }
+      visible.forEach((product) => {
+        const card = document.createElement("article");
+        card.className = "product-card reveal";
+        const defaultColor = product.colors[0];
+        card.innerHTML =
+          '<div class="product-card-media">' +
+            '<img src="' + product.image + '" alt="' + product.name + ' wireless earbuds" width="600" height="600" loading="lazy" />' +
+          '</div>' +
+          '<div class="product-card-body">' +
+            '<h3>' + product.name + '</h3>' +
+            '<p class="product-card-desc">' + product.shortDescription + '</p>' +
+            '<div class="product-card-colors" aria-label="Available colors">' +
+              product.colors.map((c) => '<span class="color-dot" style="background:' + c.hex + '" title="' + c.name + '" aria-label="' + c.name + '"></span>').join("") +
+            '</div>' +
+            '<p class="product-card-price">' + formatINR(product.pricePaise) + '</p>' +
+            '<div class="product-card-actions">' +
+              '<button type="button" class="btn btn-dark" data-action="add">Add to Bag</button>' +
+            '</div>' +
+          '</div>';
+        card.querySelector('[data-action="add"]').addEventListener("click", () => {
+          addToCart(product.id, defaultColor.id, 1);
+          openBag();
+        });
+        grid.appendChild(card);
+        // Reveal newly rendered cards
+        requestAnimationFrame(() => card.classList.add("is-visible"));
+      });
+    }
+    renderCollection();
+
+    /* ---------- Search ---------- */
+    const searchToggle = $("#searchToggle");
+    const searchPanel = $("#searchPanel");
+    const searchForm = $("#searchForm");
+    const searchInput = $("#searchInput");
+    const searchResults = $("#searchResults");
+
+    searchToggle.addEventListener("click", () => {
+      const expanded = searchToggle.getAttribute("aria-expanded") === "true";
+      searchToggle.setAttribute("aria-expanded", String(!expanded));
+      searchPanel.hidden = expanded;
+      if (!expanded) searchInput.focus();
+    });
+
+    function runSearch(query) {
+      const q = query.trim().toLowerCase();
+      searchResults.innerHTML = "";
+      if (!q) return;
+      const matches = products.filter((p) => p.name.toLowerCase().includes(q));
+      if (matches.length === 0) {
+        searchResults.innerHTML = '<p class="search-empty">No matches for “' + query + '”.</p>';
+        return;
+      }
+      matches.forEach((p) => {
+        const row = document.createElement("div");
+        row.className = "search-result";
+        row.innerHTML = "<span>" + p.name + "</span><span>" + formatINR(p.pricePaise) + "</span>";
+        searchResults.appendChild(row);
+      });
+    }
+    searchForm.addEventListener("submit", (e) => { e.preventDefault(); runSearch(searchInput.value); });
+    searchInput.addEventListener("input", () => runSearch(searchInput.value));
+
+    /* ---------- Newsletter ---------- */
+    const newsletterForm = $("#newsletterForm");
+    const newsletterEmail = $("#newsletterEmail");
+    const newsletterStatus = $("#newsletterStatus");
+
+    newsletterForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const value = newsletterEmail.value.trim();
+      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!value) {
+        newsletterStatus.textContent = "Please enter your email address.";
+        newsletterStatus.className = "form-status error";
+        newsletterEmail.setAttribute("aria-invalid", "true");
+        newsletterEmail.focus();
+        return;
+      }
+      if (!pattern.test(value)) {
+        newsletterStatus.textContent = "Please enter a valid email address.";
+        newsletterStatus.className = "form-status error";
+        newsletterEmail.setAttribute("aria-invalid", "true");
+        newsletterEmail.focus();
+        return;
+      }
+      newsletterEmail.removeAttribute("aria-invalid");
+      newsletterStatus.textContent = "Demo form — connect an email marketing service to actually subscribe.";
+      newsletterStatus.className = "form-status success";
+      newsletterForm.reset();
+    });
+
+    /* ---------- FAQ ---------- */
+    $$(".faq-question").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const expanded = btn.getAttribute("aria-expanded") === "true";
+        const panel = document.getElementById(btn.getAttribute("aria-controls"));
+        btn.setAttribute("aria-expanded", String(!expanded));
+        if (panel) panel.hidden = expanded;
+      });
+    });
+
+    /* ---------- Mobile menu ---------- */
+    const menuToggle = $("#menuToggle");
+    const mobileMenu = $("#mobileMenu");
+    menuToggle.addEventListener("click", () => {
+      const expanded = menuToggle.getAttribute("aria-expanded") === "true";
+      menuToggle.setAttribute("aria-expanded", String(!expanded));
+      mobileMenu.hidden = expanded;
+    });
+    $$("a", mobileMenu).forEach((a) => a.addEventListener("click", () => {
+      mobileMenu.hidden = true;
+      menuToggle.setAttribute("aria-expanded", "false");
+    }));
+
+    /* ---------- Escape ---------- */
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (!bagDrawer.hidden) closeBag();
+      if (!mobileMenu.hidden) { mobileMenu.hidden = true; menuToggle.setAttribute("aria-expanded", "false"); }
+      if (!searchPanel.hidden) { searchPanel.hidden = true; searchToggle.setAttribute("aria-expanded", "false"); }
+    });
+
+    /* ---------- Header scroll ---------- */
+    const header = $("#siteHeader");
+    const onScroll = () => header.classList.toggle("is-scrolled", window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    /* ---------- Reveal ---------- */
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      $$(".reveal").forEach((el) => io.observe(el));
+    } else {
+      $$(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+
+
+
+    /* ---------- Cursor-controlled generative soundscape ---------- */
+    (() => {
+      const section = document.getElementById("experience");
+      const toggle = document.getElementById("soundToggle");
+      const toggleText = document.getElementById("soundToggleText");
+      const status = document.getElementById("soundStatus");
+      const volumeControl = document.getElementById("soundVolume");
+      const bars = Array.from(document.querySelectorAll("#soundVisualizer i"));
+      if (!section || !toggle || !status || !volumeControl) return;
+
+      let audioContext = null;
+      let masterGain = null;
+      let leftPan = null;
+      let rightPan = null;
+      let leftTone = null;
+      let rightTone = null;
+      let noiseGain = null;
+      let noiseSource = null;
+      let enabled = false;
+      let targetX = 0.5;
+      let targetY = 0.5;
+      let lastX = 0.5;
+      let lastY = 0.5;
+      let motionEnergy = 0;
+      let animationFrame = 0;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function createNoiseBuffer(ctx) {
+        const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.22;
+        return buffer;
+      }
+
+      async function enableAudio() {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+          status.textContent = "Audio unavailable";
+          toggleText.textContent = "Audio unavailable";
+          toggle.disabled = true;
+          return;
+        }
+        try {
+          if (!audioContext) {
+            audioContext = new AudioContextClass();
+            masterGain = audioContext.createGain();
+            masterGain.gain.value = 0;
+            masterGain.connect(audioContext.destination);
+
+            leftPan = audioContext.createStereoPanner ? audioContext.createStereoPanner() : null;
+            rightPan = audioContext.createStereoPanner ? audioContext.createStereoPanner() : null;
+
+            leftTone = audioContext.createOscillator();
+            leftTone.type = "sine";
+            leftTone.frequency.value = 174.61;
+            const leftFilter = audioContext.createBiquadFilter();
+            leftFilter.type = "lowpass";
+            leftFilter.frequency.value = 420;
+            const leftGain = audioContext.createGain();
+            leftGain.gain.value = 0.12;
+            leftTone.connect(leftFilter);
+            leftFilter.connect(leftGain);
+            if (leftPan) { leftGain.connect(leftPan); leftPan.connect(masterGain); }
+            else leftGain.connect(masterGain);
+
+            rightTone = audioContext.createOscillator();
+            rightTone.type = "sine";
+            rightTone.frequency.value = 220;
+            const rightFilter = audioContext.createBiquadFilter();
+            rightFilter.type = "lowpass";
+            rightFilter.frequency.value = 560;
+            const rightGain = audioContext.createGain();
+            rightGain.gain.value = 0.075;
+            rightTone.connect(rightFilter);
+            rightFilter.connect(rightGain);
+            if (rightPan) { rightGain.connect(rightPan); rightPan.connect(masterGain); }
+            else rightGain.connect(masterGain);
+
+            const noiseFilter = audioContext.createBiquadFilter();
+            noiseFilter.type = "lowpass";
+            noiseFilter.frequency.value = 700;
+            noiseGain = audioContext.createGain();
+            noiseGain.gain.value = 0.018;
+            noiseSource = audioContext.createBufferSource();
+            noiseSource.buffer = createNoiseBuffer(audioContext);
+            noiseSource.loop = true;
+            noiseSource.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(masterGain);
+
+            leftTone.start();
+            rightTone.start();
+            noiseSource.start();
+          }
+          await audioContext.resume();
+          enabled = true;
+          section.classList.add("is-audio-on");
+          toggle.setAttribute("aria-pressed", "true");
+          toggleText.textContent = "Mute sound";
+          status.textContent = "Sound on";
+          const now = audioContext.currentTime;
+          masterGain.gain.cancelScheduledValues(now);
+          masterGain.gain.setTargetAtTime(Number(volumeControl.value), now, 0.18);
+          updateAudio();
+        } catch (error) {
+          status.textContent = "Audio unavailable";
+          toggleText.textContent = "Try sound again";
+          console.warn("SONA soundscape could not start:", error);
+        }
+      }
+
+      function disableAudio() {
+        enabled = false;
+        section.classList.remove("is-audio-on");
+        toggle.setAttribute("aria-pressed", "false");
+        toggleText.textContent = "Enable sound";
+        status.textContent = "Sound off";
+        if (audioContext && masterGain) {
+          const now = audioContext.currentTime;
+          masterGain.gain.cancelScheduledValues(now);
+          masterGain.gain.setTargetAtTime(0, now, 0.08);
+        }
+      }
+
+      function updateAudio() {
+        if (!enabled || !audioContext || !masterGain) return;
+        const now = audioContext.currentTime;
+        const pan = (targetX - 0.5) * 1.7;
+        const center = 1 - Math.min(1, Math.abs(targetX - 0.5) * 2);
+        const vertical = 1 - targetY;
+        if (leftPan) leftPan.pan.setTargetAtTime(Math.max(-1, Math.min(1, pan - 0.22)), now, 0.12);
+        if (rightPan) rightPan.pan.setTargetAtTime(Math.max(-1, Math.min(1, pan + 0.22)), now, 0.12);
+        leftTone.frequency.setTargetAtTime(145 + vertical * 45 + center * 35, now, 0.18);
+        rightTone.frequency.setTargetAtTime(190 + center * 80 + targetY * 25, now, 0.18);
+        noiseGain.gain.setTargetAtTime(0.006 + (1 - center) * 0.016 + motionEnergy * 0.01, now, 0.22);
+      }
+
+      function onPointerMove(event) {
+        const rect = section.getBoundingClientRect();
+        targetX = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+        targetY = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+        const dx = targetX - lastX;
+        const dy = targetY - lastY;
+        motionEnergy = Math.min(1, Math.sqrt(dx * dx + dy * dy) * 18);
+        lastX = targetX;
+        lastY = targetY;
+        section.style.setProperty("--sound-x", `${targetX * 100}%`);
+        section.style.setProperty("--sound-y", `${targetY * 100}%`);
+        section.style.setProperty("--sound-energy", motionEnergy.toFixed(3));
+        if (!reducedMotion) {
+          bars.forEach((bar, index) => {
+            const wave = Math.abs(Math.sin((targetX * 8) + index * 0.52 + targetY * 4));
+            bar.style.height = `${5 + wave * (9 + motionEnergy * 25)}px`;
+          });
+        }
+        if (enabled) updateAudio();
+      }
+
+      function settle() {
+        motionEnergy *= 0.92;
+        if (motionEnergy < 0.015) motionEnergy = 0;
+        section.style.setProperty("--sound-energy", motionEnergy.toFixed(3));
+        if (enabled) updateAudio();
+        animationFrame = requestAnimationFrame(settle);
+      }
+
+      toggle.addEventListener("click", () => enabled ? disableAudio() : enableAudio());
+      volumeControl.addEventListener("input", () => {
+        if (enabled && audioContext && masterGain) {
+          masterGain.gain.setTargetAtTime(Number(volumeControl.value), audioContext.currentTime, 0.08);
+        }
+      });
+      section.addEventListener("pointermove", onPointerMove, { passive: true });
+      section.addEventListener("pointerleave", () => {
+        targetX = 0.5;
+        targetY = 0.5;
+        section.style.setProperty("--sound-x", "50%");
+        section.style.setProperty("--sound-y", "45%");
+        if (enabled) updateAudio();
+      }, { passive: true });
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && enabled) disableAudio();
+      });
+      animationFrame = requestAnimationFrame(settle);
+      window.addEventListener("pagehide", () => {
+        cancelAnimationFrame(animationFrame);
+        if (audioContext && audioContext.state !== "closed") audioContext.close();
+      }, { once: true });
+    })();
+
+
+    $("#year").textContent = String(new Date().getFullYear());
+    renderCart();
+  })();
+  </script>
+</body>
+</html>
