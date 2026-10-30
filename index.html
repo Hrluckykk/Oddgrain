@@ -34,7 +34,13 @@ section{padding:clamp(72px,10vw,135px) var(--pad);border-bottom:1px solid var(--
 .project-info{display:flex;justify-content:space-between;gap:16px;padding:17px 0 0}.project-name{font:600 19px var(--display);letter-spacing:-.04em}.project-description{font-size:11px;color:var(--muted);line-height:1.6;margin-top:6px}.project-category{font:9px var(--mono);text-transform:uppercase;color:var(--muted);text-align:right;white-space:nowrap}.project-arrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;border-bottom:1px solid var(--ink);padding:9px 0 5px;margin-top:5px;transition:gap .3s var(--ease)}.project-link:hover .project-arrow{gap:17px}
 .manifesto{background:var(--ink);color:var(--paper);position:relative;overflow:hidden}.manifesto .eyebrow,.manifesto .section-note{color:#a7a99e}.manifesto-content{display:grid;grid-template-columns:.65fr 1.35fr;gap:40px;align-items:start}.manifesto-mark{font:500 clamp(100px,20vw,280px)/.7 var(--display);letter-spacing:-.12em;color:var(--lime);position:sticky;top:130px}.manifesto-copy{font:500 clamp(32px,5vw,69px)/.98 var(--display);letter-spacing:-.07em;max-width:900px}.manifesto-copy span{color:var(--pink);font-family:Georgia,serif;font-style:italic}.manifesto-bottom{display:flex;justify-content:space-between;gap:20px;border-top:1px solid rgba(232,228,220,.25);margin-top:65px;padding-top:20px;font:10px var(--mono);text-transform:uppercase;color:#a7a99e}
 .services{background:var(--orange)}.services .section-note{color:rgba(24,26,23,.7)}.service-list{border-top:1px solid rgba(24,26,23,.35)}.service{display:grid;grid-template-columns:70px 1fr 1fr 30px;gap:22px;align-items:center;padding:24px 0;border-bottom:1px solid rgba(24,26,23,.35);transition:padding .4s var(--ease)}.service:hover{padding-left:12px;padding-right:12px}.service-num{font:10px var(--mono)}.service h3{font:500 clamp(23px,3vw,42px) var(--display);letter-spacing:-.06em;margin:0}.service p{font-size:12px;line-height:1.7;max-width:360px;margin:0}.service-arrow{font-size:24px;transition:transform .3s}.service:hover .service-arrow{transform:rotate(45deg)}
-.archive{background:#d4d8c8}.archive-switch{display:flex;gap:8px;margin-bottom:20px}.filter{background:transparent;border:1px solid var(--line);border-radius:100px;padding:10px 15px;font:10px var(--mono);text-transform:uppercase;transition:background .2s,color .2s}.filter.active,.filter:hover{background:var(--ink);color:var(--paper)}.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.gallery-card{min-width:0}.gallery-image{aspect-ratio:4/5;position:relative;background:#c1c4b7;border:1px dashed rgba(24,26,23,.45);overflow:hidden;display:grid;place-items:center}.gallery-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;transition:transform .8s var(--ease)}.gallery-image.has-image img{display:block}.gallery-image.has-image .placeholder{display:none}.gallery-card:hover img{transform:scale(1.04)}.placeholder{text-align:center;padding:16px;color:#66695f}.placeholder b{display:block;font:500 12px var(--display);margin:12px 0 6px}.placeholder span{font:9px var(--mono);text-transform:uppercase;line-height:1.6}.gallery-meta{display:flex;justify-content:space-between;gap:8px;padding:10px 0 18px;font-size:10px}.gallery-meta span:last-child{font:9px var(--mono);color:var(--muted);text-transform:uppercase}.archive-note{font-size:11px;line-height:1.7;color:var(--muted);margin-top:20px}
+.archive{background:#d4d8c8}.archive-switch{display:flex;gap:8px;margin-bottom:20px}.filter{background:transparent;border:1px solid var(--line);border-radius:100px;padding:10px 15px;font:10px var(--mono);text-transform:uppercase;transition:background .2s,color .2s}.filter.active,.filter:hover{background:var(--ink);color:var(--paper)}.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.gallery-card{min-width:0}.gallery-image{aspect-ratio:4/5;position:relative;background:#c1c4b7;border:1px dashed rgba(24,26,23,.45);overflow:hidden;display:grid;place-items:center}.gallery-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;transition:transform .8s var(--ease)}
+.gallery-image iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#e8e4dc}
+.gallery-image.is-pinterest{background:#e8e4dc;border-style:solid}
+.gallery-image.is-pinterest:after{content:"";position:absolute;inset:0;pointer-events:none;border:1px solid rgba(24,26,23,.08)}
+.gallery-image img{display:block}
+.gallery-image .placeholder{display:none}
+.gallery-image.has-image img{display:block}.gallery-image.has-image .placeholder{display:none}.gallery-card:hover img{transform:scale(1.04)}.placeholder{text-align:center;padding:16px;color:#66695f}.placeholder b{display:block;font:500 12px var(--display);margin:12px 0 6px}.placeholder span{font:9px var(--mono);text-transform:uppercase;line-height:1.6}.gallery-meta{display:flex;justify-content:space-between;gap:8px;padding:10px 0 18px;font-size:10px}.gallery-meta span:last-child{font:9px var(--mono);color:var(--muted);text-transform:uppercase}.archive-note{font-size:11px;line-height:1.7;color:var(--muted);margin-top:20px}
 .copy{background:var(--blue)}.copy-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}.quote-card{min-height:360px;padding:clamp(25px,5vw,60px);background:var(--lime);border:1px solid var(--ink);display:flex;flex-direction:column;justify-content:space-between;transform:rotate(-1deg);transition:transform .5s var(--ease)}.quote-card:hover{transform:rotate(0) translateY(-4px)}.quote-label,.quote-foot{font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em}.quote-card blockquote{font:500 clamp(32px,4.7vw,62px)/.93 var(--display);letter-spacing:-.075em;margin:55px 0}.copy-detail{padding:20px 0;display:flex;flex-direction:column;justify-content:center}.copy-detail h3{font:500 30px var(--display);letter-spacing:-.06em;margin:0 0 15px}.copy-detail p{font-size:13px;line-height:1.8;max-width:430px}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}.tags span{border:1px solid rgba(24,26,23,.4);border-radius:99px;padding:8px 11px;font:9px var(--mono);text-transform:uppercase}
 .about{background:var(--paper)}.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px}.about-lead{font:500 clamp(35px,5.5vw,76px)/.94 var(--display);letter-spacing:-.075em}.about-text{font-size:13px;line-height:1.9;max-width:580px}.about-text p+p{margin-top:18px}.skill-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:24px}.skill-tags span{border:1px solid var(--line);border-radius:100px;padding:8px 10px;font:9px var(--mono)}
 .contact{background:var(--pink);padding-bottom:60px}.contact-top{display:flex;justify-content:space-between;gap:20px;font:10px var(--mono);text-transform:uppercase}.contact h2{font-size:clamp(58px,12vw,165px);max-width:1050px;margin:70px 0 60px}.contact-bottom{display:flex;justify-content:space-between;align-items:end;gap:25px}.contact-bottom p{max-width:330px;font-size:13px;line-height:1.7}.contact-link{font:600 clamp(15px,2vw,22px) var(--display);border-bottom:1px solid var(--ink);padding:12px 0;display:inline-flex;gap:14px;align-items:center;white-space:nowrap;transition:gap .3s}.contact-link:hover{gap:24px}footer{display:flex;justify-content:space-between;gap:20px;padding:22px var(--pad);font:9px var(--mono);text-transform:uppercase;color:var(--muted)}.backtop{color:var(--ink)}
@@ -90,10 +96,10 @@ section{padding:clamp(72px,10vw,135px) var(--pad);border-bottom:1px solid var(--
   </div>
 </section>
 <section class="archive" id="visuals">
-  <div class="section-top reveal"><div><div class="eyebrow">04 / Visual archive</div><h2>Proof of <em>practice.</em></h2></div><p class="section-note">Your work should do the talking. Add real Adobe designs and photographs here; the texture and layout are ready for them.</p></div>
+  <div class="section-top reveal"><div><div class="eyebrow">04 / Visual archive</div><h2>Proof of <em>practice.</em></h2></div><p class="section-note">A working archive of selected graphic design and photography. A mix of personal work and visual references, gathered in one place.</p></div>
   <div class="archive-switch reveal"><button class="filter active" data-filter="adobe">Adobe / Design</button><button class="filter" data-filter="photo">Photography</button></div>
   <div class="gallery" id="gallery"></div>
-  <p class="archive-note">Add images to <code>assets/adobe/</code> or <code>assets/photography/</code> using the filenames adobe-01.jpg to adobe-08.jpg and photo-01.jpg to photo-08.jpg.</p>
+  <p class="archive-note">Selected graphic work and photographs. Pinterest references open from their original pins.</p>
 </section>
 <section class="copy" id="copy">
   <div class="section-top reveal"><div><div class="eyebrow">05 / Language is a material</div><h2>Make it mean<br><em>something.</em></h2></div><p class="section-note">Copy is not filler between visuals. It is part of the idea, part of the voice, part of the experience.</p></div>
@@ -118,9 +124,56 @@ function cursorLoop(){cx+=(mx-cx)*.18;cy+=(my-cy)*.18;cursor.style.left=cx+'px';
 document.querySelectorAll('a,button,.project-art').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.classList.add(el.dataset.cursor==='view'?'is-hover':'is-link')});el.addEventListener('mouseleave',()=>cursor.classList.remove('is-hover','is-link'))});
 const progress=document.querySelector('.progress');function updateProgress(){const max=document.documentElement.scrollHeight-innerHeight;progress.style.width=(max>0?scrollY/max*100:0)+'%'}addEventListener('scroll',updateProgress,{passive:true});updateProgress();
 const revealObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target)}}),{threshold:.1});document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
-const galleryData={adobe:[['Campaign / Graphic Design','https://pub-23829b735d524cbaa428c0e9534df703.r2.dev/Gritty%20Retro%20Collage%20in%20Blue%20and%20Orange-4.png'],['Brand identity','https://pub-23829b735d524cbaa428c0e9534df703.r2.dev/Topographic%20Waves%20in%20Blue%20and%20Orange-8.png'],['Digital composition','adobe-03.jpg'],['Social creative','adobe-04.jpg'],['Poster / Typography','adobe-05.jpg'],['Photo manipulation','adobe-06.jpg'],['3D / Product visual','adobe-07.jpg'],['Other experiments','adobe-08.jpg']],photo:[['Featured photograph','photo-01.jpg'],['Street / Everyday','photo-02.jpg'],['Portrait / People','photo-03.jpg'],['Architecture / Place','photo-04.jpg'],['Colour study','photo-05.jpg'],['Texture / Detail','photo-06.jpg'],['Travel / Landscape','photo-07.jpg'],['Personal favourite','photo-08.jpg']]};
+const galleryData={
+  adobe:[
+    {label:'Graphic composition / 01',kind:'pin',id:'1099582065805237563',url:'https://in.pinterest.com/pin/1099582065805237563/'},
+    {label:'Visual identity / 02',kind:'pin',id:'1099582065804301034',url:'https://in.pinterest.com/pin/1099582065804301034/'},
+    {label:'Digital artwork / 03',kind:'pin',id:'1099582065803508258',url:'https://in.pinterest.com/pin/1099582065803508258/'},
+    {label:'Poster / Graphic design / 04',kind:'pin',id:'1099582065805551193',url:'https://in.pinterest.com/pin/1099582065805551193/'}
+  ],
+  photo:[
+    {label:'Photography / 01',kind:'pin',id:'1099582065819458853',url:'https://in.pinterest.com/pin/1099582065819458853/'},
+    {label:'Photography / 02',kind:'pin',id:'1099582065804461917',url:'https://in.pinterest.com/pin/1099582065804461917/'},
+    {label:'Photography / 03',kind:'pin',id:'1099582065803574745',url:'https://in.pinterest.com/pin/1099582065803574745/'},
+    {label:'Personal photograph / 04',kind:'image',src:'https://pub-23829b735d524cbaa428c0e9534df703.r2.dev/IMG_20261023_155054.jpg'},
+    {label:'Personal photograph / 05',kind:'image',src:'https://pub-23829b735d524cbaa428c0e9534df703.r2.dev/IMG_20261024_221404.jpg'},
+    {label:'Personal photograph / 06',kind:'image',src:'https://pub-23829b735d524cbaa428c0e9534df703.r2.dev/IMG_20261028_010552.jpg'}
+  ]
+};
 const gallery=document.getElementById('gallery');
-function renderGallery(type){gallery.innerHTML='';galleryData[type].forEach((item,i)=>{const folder=type==='adobe'?'adobe':'photography';const src=item[1].startsWith('https://')?item[1]:`assets/${folder}/${item[1]}`;const card=document.createElement('article');card.className='gallery-card reveal';card.innerHTML=`<div class="gallery-image"><img alt="${item[0]}" loading="lazy"><div class="placeholder"><span>0${i+1} / 08</span><b>${item[0]}</b><span>Your work goes here</span></div></div><div class="gallery-meta"><span>${item[0]}</span><span>${type==='adobe'?'Design':'Photo'}</span></div>`;const img=card.querySelector('img');img.onload=()=>card.querySelector('.gallery-image').classList.add('has-image');img.src=src;gallery.appendChild(card);revealObserver.observe(card)})}
+function renderGallery(type){
+  gallery.innerHTML='';
+  galleryData[type].forEach((item,i)=>{
+    const card=document.createElement('article');
+    card.className='gallery-card reveal';
+    const media=document.createElement(item.kind==='pin'?'iframe':'img');
+    const frame=document.createElement('div');
+    frame.className='gallery-image'+(item.kind==='pin'?' is-pinterest':'');
+    if(item.kind==='pin'){
+      media.src=`https://assets.pinterest.com/ext/embed.html?id=${item.id}`;
+      media.title=item.label;
+      media.loading='lazy';
+      media.referrerPolicy='strict-origin-when-cross-origin';
+      media.allow='clipboard-write';
+      frame.appendChild(media);
+    }else{
+      media.alt=item.label;
+      media.loading='lazy';
+      media.src=item.src;
+      frame.appendChild(media);
+    }
+    const meta=document.createElement('div');
+    meta.className='gallery-meta';
+    const name=document.createElement('span');
+    name.textContent=item.label;
+    const category=document.createElement('span');
+    category.textContent=type==='adobe'?'Design':'Photo';
+    meta.append(name,category);
+    card.append(frame,meta);
+    gallery.appendChild(card);
+    revealObserver.observe(card);
+  });
+}
 document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));renderGallery(btn.dataset.filter)}));renderGallery('adobe');
 const nav=document.querySelector('nav');nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('nav-open')));const navStyle=document.createElement('style');navStyle.textContent='@media(max-width:850px){nav.nav-open{position:absolute;top:100%;left:0;right:0;background:var(--paper);padding:20px var(--pad);display:flex;flex-direction:column;align-items:flex-start;border-bottom:1px solid var(--line)}nav.nav-open a{display:block!important}}';document.head.appendChild(navStyle);
 </script>
